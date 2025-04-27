@@ -6,7 +6,7 @@
 
     <router-link to="/" class="brand">
       <img src="@/assets/images/logo.png" alt="Logo" class="brand-logo me-2" style="height: 40px; border-radius: 4px;">
-      <span>CÔNG TY CỔ PHẦN DỆT MAY 29/3</span>
+      <span>{{ companyName }}</span>
     </router-link>
 
     <div class="header-nav">
@@ -55,7 +55,7 @@
         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
           <img v-if="currentUser && currentUser.avatar" :src="currentUser.avatar" alt="Avatar" class="rounded-circle" width="32" height="32">
           <font-awesome-icon v-else icon="user" />
-          <span class="ms-2 d-none d-md-inline">{{ currentUser ? currentUser.username : '' }}</span>
+          <span class="ms-2 d-none d-md-inline">{{ currentUser ? (currentUser.is_superuser ? 'Admin' : currentUser.username) : '' }}</span>
         </a>
         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
           <h6 class="dropdown-header">{{ currentUser ? currentUser.full_name : '' }}</h6>
@@ -88,8 +88,12 @@ export default {
     ...mapGetters({
       currentUser: 'auth/currentUser',
       notifications: 'notifications/allNotifications',
-      unreadCount: 'notifications/unreadCount'
-    })
+      unreadCount: 'notifications/unreadCount',
+      companyInfo: 'company/companyInfo'
+    }),
+    companyName() {
+      return this.companyInfo ? this.companyInfo.name : 'SmartHRM';
+    }
   },
   methods: {
     ...mapActions({
@@ -162,6 +166,9 @@ export default {
   created() {
     // Tải thông báo khi component được tạo
     this.fetchNotifications()
+
+    // Tải thông tin công ty
+    this.$store.dispatch('company/fetchCompanyInfo')
   }
 }
 </script>

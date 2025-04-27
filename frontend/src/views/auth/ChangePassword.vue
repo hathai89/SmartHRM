@@ -69,7 +69,7 @@
             </div>
             <div class="form-text" v-if="newPassword">
               <div :class="{'text-success': isStrongPassword, 'text-danger': !isStrongPassword}">
-                <font-awesome-icon :icon="isStrongPassword ? 'check' : 'times'" /> 
+                <font-awesome-icon :icon="isStrongPassword ? 'check' : 'times'" />
                 Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt
               </div>
             </div>
@@ -99,7 +99,7 @@
             </div>
             <div class="form-text" v-if="confirmPassword">
               <div :class="{'text-success': passwordsMatch, 'text-danger': !passwordsMatch}">
-                <font-awesome-icon :icon="passwordsMatch ? 'check' : 'times'" /> 
+                <font-awesome-icon :icon="passwordsMatch ? 'check' : 'times'" />
                 Mật khẩu xác nhận phải trùng khớp
               </div>
             </div>
@@ -167,7 +167,8 @@ export default {
       setError: 'setError',
       clearError: 'clearError',
       setSuccess: 'setSuccess',
-      clearSuccess: 'clearSuccess'
+      clearSuccess: 'clearSuccess',
+      changePasswordAction: 'auth/changePassword'
     }),
     toggleShowCurrentPassword() {
       this.showCurrentPassword = !this.showCurrentPassword
@@ -187,14 +188,16 @@ export default {
 
       try {
         // Gọi API để đổi mật khẩu
-        // await authService.changePassword({
-        //   old_password: this.currentPassword,
-        //   new_password: this.newPassword
+        // Trong thực tế, bạn sẽ gọi API để đổi mật khẩu
+        // await this.changePasswordAction({
+        //   oldPassword: this.currentPassword,
+        //   newPassword: this.newPassword,
+        //   confirmPassword: this.confirmPassword
         // })
-        
+
         // Giả lập API call thành công
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
+
         this.success = 'Mật khẩu của bạn đã được thay đổi thành công.'
         this.currentPassword = ''
         this.newPassword = ''
@@ -217,19 +220,19 @@ export default {
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   }
-  
+
   .btn-primary {
     background: linear-gradient(90deg, var(--primary-color, #003366) 0%, var(--accent-color, #ff6600) 100%);
     border: none;
     padding: 0.5rem 1.5rem;
     font-weight: 500;
     transition: all 0.3s ease;
-    
+
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
-    
+
     &:disabled {
       background: #6c757d;
       transform: none;

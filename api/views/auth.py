@@ -64,14 +64,16 @@ class AuthViewSet(viewsets.ViewSet):
         """
         Đăng xuất và xóa token
         """
-        # Xóa token
-        try:
-            request.user.auth_token.delete()
-        except:
-            pass
+        # Kiểm tra xem người dùng đã đăng nhập chưa
+        if request.user.is_authenticated:
+            # Xóa token
+            try:
+                request.user.auth_token.delete()
+            except:
+                pass
 
-        # Đăng xuất
-        logout(request)
+            # Đăng xuất
+            logout(request)
 
         return Response({'detail': 'Đăng xuất thành công'})
 

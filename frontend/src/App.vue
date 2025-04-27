@@ -18,7 +18,6 @@
             <div class="brand">
               <router-link to="/dashboard" class="brand-link">
                 <img src="@/assets/images/logo.png" alt="SmartHRM Logo" class="brand-logo">
-                <span>Hachiba</span>
               </router-link>
             </div>
 
@@ -29,6 +28,25 @@
               </button>
 
               <ul class="nav-menu" :class="{ 'show': mobileMenuOpen }">
+                <!-- Thông tin người dùng (chỉ hiển thị trên mobile) -->
+                <li class="nav-item user-info-mobile d-lg-none" v-if="isAuthenticated">
+                  <div class="user-info-container">
+                    <div class="user-avatar">
+                      <img v-if="$store.getters['auth/currentUser'] && $store.getters['auth/currentUser'].avatar"
+                           :src="$store.getters['auth/currentUser'].avatar"
+                           alt="Avatar"
+                           class="rounded-circle">
+                      <i v-else class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-details">
+                      <div class="user-name">{{ username }}</div>
+                      <div class="user-role" v-if="$store.getters['auth/currentUser']">
+                        {{ $store.getters['auth/currentUser'].is_superuser ? 'Quản trị viên' : 'Người dùng' }}
+                      </div>
+                    </div>
+                  </div>
+                </li>
+
                 <li class="nav-item">
                   <router-link to="/dashboard" class="nav-link">
                     <i class="fas fa-tachometer-alt"></i> Bảng điều khiển
@@ -130,10 +148,14 @@
 
             <!-- User Menu and Notifications -->
             <div class="user-menu">
+              <!-- Nút thông báo với nhãn -->
               <div class="notifications dropdown">
-                <a href="#" class="dropdown-toggle" @click.prevent="toggleDropdown('notifications')">
-                  <i class="fas fa-bell"></i>
-                  <span class="badge" v-if="unreadNotifications > 0">{{ unreadNotifications }}</span>
+                <a href="#" class="dropdown-toggle notification-btn" @click.prevent="toggleDropdown('notifications')" title="Thông báo">
+                  <div class="icon-container">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge" v-if="unreadNotifications > 0">{{ unreadNotifications }}</span>
+                  </div>
+                  <span class="btn-label d-none d-md-inline">Thông báo</span>
                 </a>
                 <div class="dropdown-menu notifications-menu" :class="{ 'show': activeDropdown === 'notifications' }">
                   <div class="dropdown-header">
@@ -161,9 +183,12 @@
                 </div>
               </div>
 
+              <!-- Nút người dùng với nhãn -->
               <div class="user dropdown">
-                <a href="#" class="dropdown-toggle" @click.prevent="toggleDropdown('user')">
-                  <i class="fas fa-user-circle"></i>
+                <a href="#" class="dropdown-toggle user-btn" @click.prevent="toggleDropdown('user')" title="Tài khoản">
+                  <div class="icon-container">
+                    <i class="fas fa-user-circle"></i>
+                  </div>
                   <span class="username">{{ username }}</span>
                 </a>
                 <div class="dropdown-menu user-menu" :class="{ 'show': activeDropdown === 'user' }">
@@ -196,7 +221,7 @@
       <footer class="app-footer" v-if="isAuthenticated">
         <div class="container-fluid">
           <div class="footer-content">
-            <p class="copyright">© {{ currentYear }} CÔNG TY CỔ PHẦN DỆT MAY 29/3. Bản quyền thuộc về công ty.</p>
+            <p class="copyright">© {{ currentYear }} {{ companyName }}. Bản quyền thuộc về công ty.</p>
           </div>
         </div>
       </footer>
@@ -220,7 +245,7 @@ export default {
       activeDropdown: null,
       notifications: [],
       unreadNotifications: 0,
-      username: 'Admin'
+      username: ''
     }
   },
   computed: {
@@ -232,6 +257,10 @@ export default {
     },
     breadcrumbs() {
       return getBreadcrumbs(this.$route.name, this.$route.params);
+    },
+    companyName() {
+      const companyInfo = this.$store.getters['company/companyInfo'];
+      return companyInfo ? companyInfo.name : 'SmartHRM';
     }
   },
   created() {
@@ -240,6 +269,9 @@ export default {
 
     // Đóng dropdown khi click ra ngoài
     document.addEventListener('click', this.closeDropdownsOnClickOutside);
+
+    // Lấy thông tin công ty
+    this.fetchCompanyInfo();
   },
   beforeUnmount() {
     document.removeEventListener('click', this.closeDropdownsOnClickOutside);
@@ -295,20 +327,12 @@ export default {
 
     async fetchNotifications() {
       try {
-        // Giả lập API call
-        // Trong thực tế, bạn sẽ gọi API thực sự
+        // Trong thực tế, bạn sẽ gọi API thực sự để lấy thông báo
         // const response = await this.$api.get('/notifications');
 
-        // Dữ liệu mẫu
-        setTimeout(() => {
-          this.notifications = [
-            { id: 1, message: 'Có 3 nhân viên mới cần phê duyệt', time: '10 phút trước', read: false },
-            { id: 2, message: 'Báo cáo tháng đã được cập nhật', time: '1 giờ trước', read: false },
-            { id: 3, message: 'Lịch họp tuần đã được cập nhật', time: '2 giờ trước', read: true }
-          ];
-
-          this.unreadNotifications = this.notifications.filter(n => !n.read).length;
-        }, 1000);
+        // Tạm thời để trống, sẽ được cập nhật khi API thông báo được triển khai
+        this.notifications = [];
+        this.unreadNotifications = 0;
       } catch (error) {
         console.error('Lỗi khi lấy thông báo:', error);
       }
@@ -316,14 +340,11 @@ export default {
 
     async fetchUserInfo() {
       try {
-        // Giả lập API call
-        // Trong thực tế, bạn sẽ gọi API thực sự
-        // const response = await this.$api.get('/user/profile');
-
-        // Dữ liệu mẫu
-        setTimeout(() => {
-          this.username = 'Nguyễn Văn A';
-        }, 1000);
+        // Lấy thông tin người dùng từ store
+        const user = this.$store.getters['auth/currentUser'];
+        if (user) {
+          this.username = user.is_superuser ? 'Admin' : user.username;
+        }
       } catch (error) {
         console.error('Lỗi khi lấy thông tin người dùng:', error);
       }
@@ -335,6 +356,14 @@ export default {
         this.$router.push('/login');
       } catch (error) {
         console.error('Lỗi khi đăng xuất:', error);
+      }
+    },
+
+    async fetchCompanyInfo() {
+      try {
+        await this.$store.dispatch('company/fetchCompanyInfo');
+      } catch (error) {
+        console.error('Lỗi khi lấy thông tin công ty:', error);
       }
     }
   }
@@ -353,6 +382,19 @@ export default {
   box-sizing: border-box;
 }
 
+// Thiết lập border-radius 50% cho các phần tử tròn
+.rounded-circle,
+.avatar,
+.user-avatar img,
+.profile-avatar img,
+.badge,
+.dropdown-toggle[data-bs-toggle="dropdown"] .badge,
+.btn-icon,
+.btn-circle,
+.avatar-img {
+  border-radius: 50% !important;
+}
+
 body {
   font-family: $font-family-sans-serif;
   font-size: $font-size-base;
@@ -362,8 +404,8 @@ body {
 }
 
 a {
-  text-decoration: none;
   color: inherit;
+  text-decoration: none;
 }
 
 ul {
@@ -404,6 +446,10 @@ ul {
     justify-content: space-between;
     height: $header-height;
     padding: 0 1rem;
+
+    @media (max-width: $breakpoint-md) {
+      padding: 0 0.5rem;
+    }
   }
 
   .brand {
@@ -413,15 +459,40 @@ ul {
       font-size: 1.5rem;
       font-weight: $font-weight-bold;
       color: white;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+
+      @media (max-width: $breakpoint-md) {
+        font-size: 1.2rem;
+        max-width: 200px;
+      }
+
+      @media (max-width: $breakpoint-sm) {
+        max-width: 150px;
+      }
 
       .brand-logo {
         height: 40px;
         margin-right: 0.5rem;
         border-radius: 4px;
+        flex-shrink: 0;
+
+        @media (max-width: $breakpoint-sm) {
+          height: 32px;
+        }
+      }
+
+      span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       i {
         margin-right: 0.5rem;
+        flex-shrink: 0;
       }
     }
   }
@@ -433,16 +504,50 @@ ul {
 
     .mobile-menu-toggle {
       display: none;
-      background: none;
-      border: none;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       color: white;
       font-size: 1.5rem;
       cursor: pointer;
+      padding: 0.5rem;
+      z-index: 1001;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      width: 40px;
+      height: 40px;
+      position: relative;
+
+      &::after {
+        content: 'Menu';
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.7);
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+
+        &::after {
+          opacity: 1;
+        }
+      }
+
+      &:active {
+        background-color: rgba(255, 255, 255, 0.3);
+      }
 
       @media (max-width: $breakpoint-lg) {
-        display: block;
+        display: flex;
         position: absolute;
         right: 1rem;
+        align-items: center;
+        justify-content: center;
       }
     }
 
@@ -452,7 +557,7 @@ ul {
       padding: 0;
 
       @media (max-width: $breakpoint-lg) {
-        position: absolute;
+        position: fixed;
         top: $header-height;
         left: 0;
         right: 0;
@@ -461,9 +566,59 @@ ul {
         padding: 1rem 0;
         display: none;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        max-height: calc(100vh - #{$header-height});
+        overflow-y: auto;
 
         &.show {
           display: flex;
+        }
+      }
+
+      .user-info-mobile {
+        padding: 1.5rem 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        margin-bottom: 1rem;
+        background-color: rgba(0, 0, 0, 0.1);
+
+        .user-info-container {
+          display: flex;
+          align-items: center;
+
+          .user-avatar {
+            margin-right: 1rem;
+
+            img, i {
+              width: 50px;
+              height: 50px;
+              border-radius: 50%;
+              object-fit: cover;
+              border: 2px solid rgba(255, 255, 255, 0.5);
+            }
+
+            i {
+              font-size: 50px;
+              color: white;
+            }
+          }
+
+          .user-details {
+            .user-name {
+              font-weight: bold;
+              color: white;
+              font-size: 1.1rem;
+              margin-bottom: 0.3rem;
+            }
+
+            .user-role {
+              font-size: 0.85rem;
+              color: rgba(255, 255, 255, 0.8);
+              background-color: rgba(255, 255, 255, 0.1);
+              padding: 0.2rem 0.5rem;
+              border-radius: 3px;
+              display: inline-block;
+            }
+          }
         }
       }
 
@@ -480,21 +635,38 @@ ul {
 
           @media (max-width: $breakpoint-lg) {
             height: auto;
-            padding: 0.75rem 1rem;
+            padding: 1rem;
+            font-size: 1.1rem;
+            border-left: 3px solid transparent;
           }
 
           &:hover, &.router-link-active {
             color: white;
             background-color: rgba(255, 255, 255, 0.1);
+
+            @media (max-width: $breakpoint-lg) {
+              border-left-color: $accent;
+            }
           }
 
           i {
-            margin-right: 0.5rem;
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+
+            @media (max-width: $breakpoint-lg) {
+              font-size: 1.2rem;
+            }
           }
 
           .fa-chevron-down {
-            margin-left: 0.5rem;
+            margin-left: auto;
             font-size: 0.75rem;
+
+            @media (max-width: $breakpoint-lg) {
+              margin-right: 0;
+            }
           }
         }
 
@@ -513,7 +685,10 @@ ul {
             position: static;
             box-shadow: none;
             border-radius: 0;
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.15);
+            padding: 0.5rem 0;
+            margin: 0;
+            border-left: 3px solid rgba(255, 255, 255, 0.1);
           }
 
           &.show {
@@ -529,6 +704,9 @@ ul {
 
             @media (max-width: $breakpoint-lg) {
               color: rgba(255, 255, 255, 0.9);
+              padding: 0.75rem 1rem 0.75rem 2.5rem;
+              font-size: 1rem;
+              border-left: 3px solid transparent;
             }
 
             &:hover, &.router-link-active {
@@ -538,13 +716,18 @@ ul {
               @media (max-width: $breakpoint-lg) {
                 background-color: rgba(255, 255, 255, 0.1);
                 color: white;
+                border-left-color: $accent;
               }
             }
 
             i {
-              margin-right: 0.5rem;
+              margin-right: 0.75rem;
               width: 20px;
               text-align: center;
+
+              @media (max-width: $breakpoint-lg) {
+                font-size: 1.1rem;
+              }
             }
           }
         }
@@ -558,15 +741,81 @@ ul {
 
     .dropdown {
       position: relative;
-      margin-left: 1rem;
+      margin-left: 1.5rem;
+      z-index: 1001;
+
+      @media (max-width: $breakpoint-sm) {
+        margin-left: 1rem;
+      }
 
       .dropdown-toggle {
         display: flex;
         align-items: center;
         color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        position: relative;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        &.notification-btn {
+          background-color: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+
+          .icon-container {
+            position: relative;
+            margin-right: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+          }
+
+          .btn-label {
+            font-weight: 500;
+            font-size: 0.9rem;
+          }
+
+          @media (max-width: $breakpoint-md) {
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            justify-content: center;
+          }
+        }
+
+        &.user-btn {
+          background-color: rgba(0, 0, 0, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+
+          .icon-container {
+            position: relative;
+            margin-right: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+          }
+
+          @media (max-width: $breakpoint-md) {
+            background-color: transparent;
+            border: none;
+            padding: 0.5rem;
+          }
+        }
 
         i {
-          font-size: 1.25rem;
+          font-size: 1.5rem;
+
+          @media (max-width: $breakpoint-sm) {
+            font-size: 1.3rem;
+          }
         }
 
         .badge {
@@ -576,17 +825,29 @@ ul {
           background-color: $accent;
           color: white;
           border-radius: 50%;
-          width: 18px;
-          height: 18px;
+          width: 20px;
+          height: 20px;
           font-size: 0.75rem;
           display: flex;
           align-items: center;
           justify-content: center;
+          border: 2px solid $primary;
+          z-index: 2;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+          @media (max-width: $breakpoint-sm) {
+            width: 18px;
+            height: 18px;
+            font-size: 0.65rem;
+            top: -3px;
+            right: -3px;
+          }
         }
 
         .username {
           margin-left: 0.5rem;
           display: none;
+          font-weight: 500;
 
           @media (min-width: $breakpoint-md) {
             display: inline;

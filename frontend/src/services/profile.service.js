@@ -1,4 +1,4 @@
-import axios from './axios';
+import api from './api.service';
 
 /**
  * Service để tương tác với API Profile
@@ -9,7 +9,7 @@ class ProfileService {
    * @returns {Promise} - Promise chứa thông tin hồ sơ
    */
   getProfile() {
-    return axios.get('/auth/profile/');
+    return api.get('/auth/profile/');
   }
 
   /**
@@ -18,7 +18,7 @@ class ProfileService {
    * @returns {Promise} - Promise chứa thông tin hồ sơ đã cập nhật
    */
   updateProfile(profileData) {
-    return axios.patch('/auth/profile/', profileData);
+    return api.patch('/auth/profile/', profileData);
   }
 
   /**
@@ -29,8 +29,8 @@ class ProfileService {
   uploadAvatar(file) {
     const formData = new FormData();
     formData.append('avatar', file);
-    
-    return axios.post('/auth/profile/avatar/', formData, {
+
+    return api.post('/auth/profile/avatar/', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }

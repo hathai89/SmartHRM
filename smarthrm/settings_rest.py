@@ -39,6 +39,9 @@ CORS_ALLOWED_ORIGINS = [
 # Cho phép tất cả origins trong môi trường phát triển
 CORS_ALLOW_ALL_ORIGINS = True
 
+# Cho phép same-origin requests trong production
+CORS_ALLOW_SAME_ORIGIN = True
+
 # Cấu hình CORS bổ sung
 CORS_ALLOW_CREDENTIALS = True  # Cho phép gửi cookies
 CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']

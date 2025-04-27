@@ -7,6 +7,10 @@
           <font-awesome-icon icon="sync" :class="{ 'fa-spin': loading }" />
           Làm mới
         </button>
+        <router-link to="/change-password" class="btn btn-outline-primary">
+          <font-awesome-icon icon="key" class="me-2" />
+          Đổi mật khẩu
+        </router-link>
       </div>
     </div>
 
@@ -20,10 +24,10 @@
           <div class="card card-profile">
             <div class="card-header bg-gradient-primary text-white text-center py-4">
               <div class="avatar-container mb-3">
-                <img 
-                  v-if="profileData.avatar" 
-                  :src="profileData.avatar" 
-                  alt="Avatar" 
+                <img
+                  v-if="profileData.avatar"
+                  :src="profileData.avatar"
+                  alt="Avatar"
                   class="avatar-img"
                 >
                 <div v-else class="avatar-placeholder">
@@ -82,11 +86,11 @@
                 <font-awesome-icon icon="camera" class="me-2" />
                 Thay đổi ảnh đại diện
               </button>
-              <input 
-                type="file" 
-                ref="avatarInput" 
-                class="d-none" 
-                accept="image/*" 
+              <input
+                type="file"
+                ref="avatarInput"
+                class="d-none"
+                accept="image/*"
                 @change="handleAvatarChange"
               >
             </div>
@@ -97,8 +101,8 @@
           <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
               <h5 class="mb-0">Thông tin cá nhân</h5>
-              <button 
-                class="btn btn-sm btn-outline-primary" 
+              <button
+                class="btn btn-sm btn-outline-primary"
                 @click="toggleEditMode"
               >
                 <font-awesome-icon :icon="isEditing ? 'times' : 'edit'" class="me-1" />
@@ -124,21 +128,21 @@
                 <div class="row mb-3">
                   <div class="col-md-6">
                     <label for="firstName" class="form-label">Họ</label>
-                    <input 
-                      type="text" 
-                      id="firstName" 
-                      v-model="formData.first_name" 
-                      class="form-control" 
+                    <input
+                      type="text"
+                      id="firstName"
+                      v-model="formData.first_name"
+                      class="form-control"
                       :disabled="!isEditing"
                     >
                   </div>
                   <div class="col-md-6">
                     <label for="lastName" class="form-label">Tên</label>
-                    <input 
-                      type="text" 
-                      id="lastName" 
-                      v-model="formData.last_name" 
-                      class="form-control" 
+                    <input
+                      type="text"
+                      id="lastName"
+                      v-model="formData.last_name"
+                      class="form-control"
                       :disabled="!isEditing"
                     >
                   </div>
@@ -147,21 +151,21 @@
                 <div class="row mb-3">
                   <div class="col-md-6">
                     <label for="email" class="form-label">Email</label>
-                    <input 
-                      type="email" 
-                      id="email" 
-                      v-model="formData.email" 
-                      class="form-control" 
+                    <input
+                      type="email"
+                      id="email"
+                      v-model="formData.email"
+                      class="form-control"
                       :disabled="!isEditing"
                     >
                   </div>
                   <div class="col-md-6">
                     <label for="phone" class="form-label">Số điện thoại</label>
-                    <input 
-                      type="tel" 
-                      id="phone" 
-                      v-model="formData.phone" 
-                      class="form-control" 
+                    <input
+                      type="tel"
+                      id="phone"
+                      v-model="formData.phone"
+                      class="form-control"
                       :disabled="!isEditing"
                     >
                   </div>
@@ -170,20 +174,20 @@
                 <div class="row mb-3">
                   <div class="col-md-6">
                     <label for="birthDate" class="form-label">Ngày sinh</label>
-                    <input 
-                      type="date" 
-                      id="birthDate" 
-                      v-model="formData.birth_date" 
-                      class="form-control" 
+                    <input
+                      type="date"
+                      id="birthDate"
+                      v-model="formData.birth_date"
+                      class="form-control"
                       :disabled="!isEditing"
                     >
                   </div>
                   <div class="col-md-6">
                     <label for="gender" class="form-label">Giới tính</label>
-                    <select 
-                      id="gender" 
-                      v-model="formData.gender" 
-                      class="form-select" 
+                    <select
+                      id="gender"
+                      v-model="formData.gender"
+                      class="form-select"
                       :disabled="!isEditing"
                     >
                       <option value="">-- Chọn giới tính --</option>
@@ -196,11 +200,11 @@
 
                 <div class="mb-3">
                   <label for="address" class="form-label">Địa chỉ</label>
-                  <textarea 
-                    id="address" 
-                    v-model="formData.address" 
-                    class="form-control" 
-                    rows="3" 
+                  <textarea
+                    id="address"
+                    v-model="formData.address"
+                    class="form-control"
+                    rows="3"
                     :disabled="!isEditing"
                   ></textarea>
                 </div>
@@ -208,21 +212,21 @@
                 <div class="row mb-3">
                   <div class="col-md-6">
                     <label for="idNumber" class="form-label">Số CMND/CCCD</label>
-                    <input 
-                      type="text" 
-                      id="idNumber" 
-                      v-model="formData.id_number" 
-                      class="form-control" 
+                    <input
+                      type="text"
+                      id="idNumber"
+                      v-model="formData.id_number"
+                      class="form-control"
                       :disabled="!isEditing"
                     >
                   </div>
                   <div class="col-md-6">
                     <label for="idIssueDate" class="form-label">Ngày cấp</label>
-                    <input 
-                      type="date" 
-                      id="idIssueDate" 
-                      v-model="formData.id_issue_date" 
-                      class="form-control" 
+                    <input
+                      type="date"
+                      id="idIssueDate"
+                      v-model="formData.id_issue_date"
+                      class="form-control"
                       :disabled="!isEditing"
                     >
                   </div>
@@ -230,48 +234,48 @@
 
                 <div class="mb-3">
                   <label for="idIssuePlace" class="form-label">Nơi cấp</label>
-                  <input 
-                    type="text" 
-                    id="idIssuePlace" 
-                    v-model="formData.id_issue_place" 
-                    class="form-control" 
+                  <input
+                    type="text"
+                    id="idIssuePlace"
+                    v-model="formData.id_issue_place"
+                    class="form-control"
                     :disabled="!isEditing"
                   >
                 </div>
 
                 <div class="mb-3">
                   <label for="emergencyContact" class="form-label">Người liên hệ khẩn cấp</label>
-                  <input 
-                    type="text" 
-                    id="emergencyContact" 
-                    v-model="formData.emergency_contact" 
-                    class="form-control" 
+                  <input
+                    type="text"
+                    id="emergencyContact"
+                    v-model="formData.emergency_contact"
+                    class="form-control"
                     :disabled="!isEditing"
                   >
                 </div>
 
                 <div class="mb-3">
                   <label for="emergencyPhone" class="form-label">Số điện thoại liên hệ khẩn cấp</label>
-                  <input 
-                    type="tel" 
-                    id="emergencyPhone" 
-                    v-model="formData.emergency_phone" 
-                    class="form-control" 
+                  <input
+                    type="tel"
+                    id="emergencyPhone"
+                    v-model="formData.emergency_phone"
+                    class="form-control"
                     :disabled="!isEditing"
                   >
                 </div>
 
                 <div v-if="isEditing" class="d-flex gap-2">
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     class="btn btn-primary"
                     :disabled="saving"
                   >
                     <span v-if="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                     Lưu thay đổi
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     class="btn btn-outline-secondary"
                     @click="cancelEdit"
                   >
@@ -343,7 +347,7 @@
                   <div class="info-group">
                     <label class="info-label">Trạng thái</label>
                     <div class="info-value">
-                      <span 
+                      <span
                         class="badge"
                         :class="{
                           'bg-success': profileData.status === 'active',
@@ -443,12 +447,12 @@ export default {
     }),
     async fetchProfileData() {
       this.loading = true
-      
+
       try {
         // Trong thực tế, bạn sẽ gọi API để lấy dữ liệu
         // Ở đây chúng ta sử dụng dữ liệu mẫu
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
+
         // Nếu có currentUser, cập nhật profileData
         if (this.currentUser) {
           this.profileData = {
@@ -459,7 +463,7 @@ export default {
             avatar: this.currentUser.avatar
           }
         }
-        
+
         // Khởi tạo formData từ profileData
         this.resetFormData()
       } catch (error) {
@@ -490,18 +494,18 @@ export default {
       this.saving = true
       this.error = null
       this.success = null
-      
+
       try {
         // Trong thực tế, bạn sẽ gọi API để lưu dữ liệu
         // Ở đây chúng ta giả lập API call
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
+
         // Cập nhật profileData từ formData
         this.profileData = { ...this.formData }
-        
+
         // Cập nhật full_name
         this.profileData.full_name = `${this.profileData.first_name} ${this.profileData.last_name}`
-        
+
         this.success = 'Thông tin hồ sơ đã được cập nhật thành công.'
         this.isEditing = false
       } catch (error) {
@@ -513,7 +517,7 @@ export default {
     },
     formatDate(dateString) {
       if (!dateString) return null
-      
+
       const date = new Date(dateString)
       return date.toLocaleDateString('vi-VN')
     },
@@ -535,33 +539,33 @@ export default {
     handleAvatarChange(event) {
       const file = event.target.files[0]
       if (!file) return
-      
+
       // Kiểm tra kích thước file (tối đa 5MB)
       if (file.size > 5 * 1024 * 1024) {
         this.error = 'Kích thước file quá lớn. Vui lòng chọn file nhỏ hơn 5MB.'
         return
       }
-      
+
       // Kiểm tra loại file
       if (!file.type.match('image.*')) {
         this.error = 'Vui lòng chọn file hình ảnh.'
         return
       }
-      
+
       this.selectedAvatar = file
       this.showAvatarConfirm = true
     },
     async confirmAvatarChange() {
       if (!this.selectedAvatar) return
-      
+
       this.loading = true
       this.error = null
-      
+
       try {
         // Trong thực tế, bạn sẽ gọi API để upload ảnh
         // Ở đây chúng ta giả lập API call và tạo URL cho ảnh
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
+
         const reader = new FileReader()
         reader.onload = (e) => {
           this.profileData.avatar = e.target.result
@@ -595,24 +599,24 @@ export default {
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     margin-bottom: 1.5rem;
-    
+
     .card-header {
       background-color: #f8f9fa;
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
       padding: 1rem 1.5rem;
     }
-    
+
     .card-body {
       padding: 1.5rem;
     }
-    
+
     .card-footer {
       background-color: #f8f9fa;
       border-top: 1px solid rgba(0, 0, 0, 0.1);
       padding: 1rem 1.5rem;
     }
   }
-  
+
   .card-profile {
     .avatar-container {
       width: 120px;
@@ -622,13 +626,13 @@ export default {
       overflow: hidden;
       border: 4px solid rgba(255, 255, 255, 0.3);
     }
-    
+
     .avatar-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    
+
     .avatar-placeholder {
       width: 100%;
       height: 100%;
@@ -638,57 +642,57 @@ export default {
       background-color: rgba(255, 255, 255, 0.2);
       color: white;
     }
-    
+
     .info-item {
       padding: 0.75rem 0;
       border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-      
+
       &:last-child {
         border-bottom: none;
       }
-      
+
       .info-label {
         font-size: 0.875rem;
         color: #6c757d;
         margin-bottom: 0.25rem;
       }
-      
+
       .info-value {
         font-weight: 500;
       }
     }
   }
-  
+
   .info-group {
     margin-bottom: 0.5rem;
-    
+
     .info-label {
       font-size: 0.875rem;
       color: #6c757d;
       margin-bottom: 0.25rem;
     }
-    
+
     .info-value {
       font-weight: 500;
     }
   }
-  
+
   .bg-gradient-primary {
     background: linear-gradient(135deg, var(--primary-color, #003366) 0%, var(--primary-light, #0066cc) 100%);
   }
-  
+
   .btn-primary {
     background: linear-gradient(90deg, var(--primary-color, #003366) 0%, var(--accent-color, #ff6600) 100%);
     border: none;
     padding: 0.5rem 1.5rem;
     font-weight: 500;
     transition: all 0.3s ease;
-    
+
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
-    
+
     &:disabled {
       background: #6c757d;
       transform: none;

@@ -14,13 +14,18 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
   faUser, faLock, faSignOutAlt, faCog, faBell, faHome,
   faUsers, faBuilding, faFileAlt, faBriefcase, faChartBar,
-  faPlus, faEdit, faTrash, faSearch, faEye, faCheck, faTimes,
+  faPlus, faEdit, faTrash, faSearch, faEye, faEyeSlash, faCheck, faTimes,
   faChevronDown, faChevronUp, faChevronLeft, faChevronRight,
   faExclamationTriangle, faInfoCircle, faQuestionCircle,
   faArrowLeft, faArrowRight, faSignInAlt, faIndustry, faTasks,
   faHistory, faCalendarAlt, faPhone, faEnvelope, faMapMarkerAlt,
   faFolder, faSync, faList, faTable, faFilter, faSort, faSortUp, faSortDown,
-  faDownload, faUpload, faPrint, faClipboard, faCalendar, faBook, faBookmark
+  faDownload, faUpload, faPrint, faClipboard, faCalendar, faBook, faBookmark,
+  // Thêm các biểu tượng còn thiếu
+  faBars, faUserPlus, faEllipsisV, faTrashAlt, faKey, faCamera, faIdCard,
+  faFile, faCheckCircle, faCheckDouble, faBellSlash, faAngleDoubleLeft,
+  faAngleLeft, faAngleRight, faAngleDoubleRight, faDatabase, faUsersCog,
+  faPaperPlane, faUndo, faEllipsisH, faTachometerAlt
 } from '@fortawesome/free-solid-svg-icons'
 
 // Import i18n
@@ -30,13 +35,18 @@ import i18n from './i18n'
 library.add(
   faUser, faLock, faSignOutAlt, faCog, faBell, faHome,
   faUsers, faBuilding, faFileAlt, faBriefcase, faChartBar,
-  faPlus, faEdit, faTrash, faSearch, faEye, faCheck, faTimes,
+  faPlus, faEdit, faTrash, faSearch, faEye, faEyeSlash, faCheck, faTimes,
   faChevronDown, faChevronUp, faChevronLeft, faChevronRight,
   faExclamationTriangle, faInfoCircle, faQuestionCircle,
   faArrowLeft, faArrowRight, faSignInAlt, faIndustry, faTasks,
   faHistory, faCalendarAlt, faPhone, faEnvelope, faMapMarkerAlt,
   faFolder, faSync, faList, faTable, faFilter, faSort, faSortUp, faSortDown,
-  faDownload, faUpload, faPrint, faClipboard, faCalendar, faBook, faBookmark
+  faDownload, faUpload, faPrint, faClipboard, faCalendar, faBook, faBookmark,
+  // Thêm các biểu tượng còn thiếu
+  faBars, faUserPlus, faEllipsisV, faTrashAlt, faKey, faCamera, faIdCard,
+  faFile, faCheckCircle, faCheckDouble, faBellSlash, faAngleDoubleLeft,
+  faAngleLeft, faAngleRight, faAngleDoubleRight, faDatabase, faUsersCog,
+  faPaperPlane, faUndo, faEllipsisH, faTachometerAlt
 )
 
 // i18n đã được cấu hình trong file i18n.js

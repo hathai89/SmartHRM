@@ -3,33 +3,30 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic import RedirectView
-from django.contrib.auth import views as auth_views
+from django.views.generic import RedirectView, TemplateView
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # Chuyển hướng trang chủ đến dashboard (middleware sẽ xử lý chuyển hướng cho nhân viên)
-    path('', RedirectView.as_view(pattern_name='dashboard'), name='home'),
+    # Serve Vue.js SPA
+    path('', ensure_csrf_cookie(TemplateView.as_view(template_name='vue_index.html')), name='vue-index'),
 
-    # Thêm URLs cho dashboard
-    path('dashboard/', include('dashboard.urls')),
+    # Catch all routes for Vue.js router
+    path('dashboard/', ensure_csrf_cookie(TemplateView.as_view(template_name='vue_index.html')), name='vue-dashboard'),
+    path('company/', ensure_csrf_cookie(TemplateView.as_view(template_name='vue_index.html')), name='vue-company'),
+    path('departments/', ensure_csrf_cookie(TemplateView.as_view(template_name='vue_index.html')), name='vue-departments'),
+    path('factories/', ensure_csrf_cookie(TemplateView.as_view(template_name='vue_index.html')), name='vue-factories'),
+    path('employees/', ensure_csrf_cookie(TemplateView.as_view(template_name='vue_index.html')), name='vue-employees'),
+    path('documents/', ensure_csrf_cookie(TemplateView.as_view(template_name='vue_index.html')), name='vue-documents'),
+    path('recruitment/', ensure_csrf_cookie(TemplateView.as_view(template_name='vue_index.html')), name='vue-recruitment'),
+    path('assets/', ensure_csrf_cookie(TemplateView.as_view(template_name='vue_index.html')), name='vue-assets'),
+    path('notifications/', ensure_csrf_cookie(TemplateView.as_view(template_name='vue_index.html')), name='vue-notifications'),
+    path('profile/', ensure_csrf_cookie(TemplateView.as_view(template_name='vue_index.html')), name='vue-profile'),
+    path('settings/', ensure_csrf_cookie(TemplateView.as_view(template_name='vue_index.html')), name='vue-settings'),
+    path('login/', ensure_csrf_cookie(TemplateView.as_view(template_name='vue_index.html')), name='vue-login'),
 
-    # URLs cho các ứng dụng
-    path('company/', include('company.urls')),
-    path('departments/', include('departments.urls')),
-    path('factories/', include('factories.urls')),
-    path('employees/', include('employees.urls')),
-    path('documents/', include('documents.urls')),
-    path('recruitment/', include('recruitment.urls')),
-    path('assets/', include('assets.urls')),
-    path('notifications/', include('notifications.urls')),
-
-    # URLs cho authentication
-    path('login/', auth_views.LoginView.as_view(template_name='auth/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-
-    # URLs cho authentication (alias)
+    # Legacy URLs for API compatibility
     path('accounts/login/', RedirectView.as_view(url='/login/'), name='accounts-login'),
     path('accounts/logout/', RedirectView.as_view(url='/logout/'), name='accounts-logout'),
 

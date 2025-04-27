@@ -94,9 +94,9 @@ export default {
       }
     },
 
-    async changePassword(_, { oldPassword, newPassword }) {
+    async changePassword(_, { oldPassword, newPassword, confirmPassword }) {
       try {
-        await AuthService.changePassword(oldPassword, newPassword)
+        await AuthService.changePassword(oldPassword, newPassword, confirmPassword)
         return Promise.resolve()
       } catch (error) {
         return Promise.reject(error)

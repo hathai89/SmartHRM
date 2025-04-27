@@ -4,7 +4,7 @@
       <div class="card shadow-lg">
         <div class="card-header text-center py-3">
           <img src="@/assets/images/logo.png" alt="Logo" class="img-fluid mb-2" style="max-height: 80px;">
-          <h4 class="mb-0">CÔNG TY CỔ PHẦN DỆT MAY 29/3</h4>
+          <h4 class="mb-0">{{ companyName }}</h4>
         </div>
         <div class="card-body p-4">
           <h5 class="card-title text-center mb-4">Đăng nhập hệ thống</h5>
@@ -90,14 +90,14 @@
       </div>
 
       <div class="text-center text-muted mt-3">
-        <small>&copy; {{ currentYear }} CÔNG TY CỔ PHẦN DỆT MAY 29/3</small>
+        <small>&copy; {{ currentYear }} {{ companyName }}</small>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import AlertMessage from '@/components/common/AlertMessage.vue'
 
 export default {
@@ -116,8 +116,14 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      companyInfo: 'company/companyInfo'
+    }),
     currentYear() {
       return new Date().getFullYear()
+    },
+    companyName() {
+      return this.companyInfo ? this.companyInfo.name : 'SmartHRM';
     }
   },
   methods: {
@@ -152,6 +158,10 @@ export default {
       // Chuyển hướng đến trang quên mật khẩu
       this.$router.push('/forgot-password')
     }
+  },
+  created() {
+    // Tải thông tin công ty khi component được tạo
+    this.$store.dispatch('company/fetchCompanyInfo')
   }
 }
 </script>

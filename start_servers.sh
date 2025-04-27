@@ -5,6 +5,13 @@ echo "====================================================="
 echo "          STARTING SMARTHRM SERVERS                  "
 echo "====================================================="
 
+# Thiết lập môi trường cho WeasyPrint
+echo "Setting up environment for WeasyPrint..."
+mkdir -p ~/.local/lib
+ln -sf /opt/homebrew/lib/libgobject-2.0-0.dylib ~/.local/lib/libgobject-2.0-0.dylib
+export DYLD_LIBRARY_PATH=~/.local/lib:/opt/homebrew/lib:$DYLD_LIBRARY_PATH
+export PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig:$PKG_CONFIG_PATH
+
 # Kiểm tra môi trường ảo Python
 if [ ! -d "venv" ]; then
     echo "Creating Python virtual environment..."
@@ -31,7 +38,7 @@ python manage.py migrate
 
 # Chạy Django server trong background
 echo "Starting Django backend server..."
-python manage.py runserver 8000 &
+DYLD_LIBRARY_PATH=~/.local/lib:/opt/homebrew/lib:$DYLD_LIBRARY_PATH python manage.py runserver 8000 &
 DJANGO_PID=$!
 echo "Django server running with PID: $DJANGO_PID"
 
@@ -46,11 +53,12 @@ cd ..
 echo ""
 echo "====================================================="
 echo "  SmartHRM servers are running:                      "
-echo "  - Backend: http://localhost:8000                   "
-echo "  - Frontend: http://localhost:8080                  "
-echo "  - API: http://localhost:8000/api/                  "
+echo "  - Backend API: http://localhost:8000/api/          "
+echo "  - Frontend SPA: http://localhost:8080              "
 echo "  - Admin: http://localhost:8000/admin/              "
 echo "====================================================="
+echo ""
+echo "NOTE: In production mode, everything will run on a single port."
 echo ""
 echo "Press Ctrl+C to stop all servers"
 

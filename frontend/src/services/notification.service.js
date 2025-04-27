@@ -1,16 +1,17 @@
 import api from './api.service'
+import { NOTIFICATION_ENDPOINTS } from '@/api/api'
 
 class NotificationService {
   getNotifications() {
-    return api.get('/notifications/')
+    return api.get(NOTIFICATION_ENDPOINTS.LIST)
   }
 
   markAsRead(id) {
-    return api.post(`/notifications/${id}/read/`)
+    return api.post(NOTIFICATION_ENDPOINTS.MARK_READ(id))
   }
 
   markAllAsRead() {
-    return api.post('/notifications/read-all/')
+    return api.post(NOTIFICATION_ENDPOINTS.MARK_ALL_READ)
   }
 
   deleteNotification(id) {

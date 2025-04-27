@@ -27,7 +27,7 @@
                 <i v-else class="fas fa-building fa-4x text-primary"></i>
               </div>
               <div>
-                <h4 class="mb-2">{{ companyInfo ? companyInfo.name : 'CÔNG TY CỔ PHẦN DỆT MAY 29/3' }}</h4>
+                <h4 class="mb-2">{{ companyInfo ? companyInfo.name : 'Đang tải...' }}</h4>
                 <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i>{{ companyInfo ? companyInfo.address : 'Đang tải...' }}</p>
                 <p class="mb-1"><i class="fas fa-phone me-2"></i>{{ companyInfo ? companyInfo.phone : 'Đang tải...' }}</p>
                 <p class="mb-0"><i class="fas fa-envelope me-2"></i>{{ companyInfo ? companyInfo.email : 'Đang tải...' }}</p>
@@ -198,6 +198,7 @@ import { mapGetters } from 'vuex'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import moment from 'moment'
 import { breadcrumbMixin } from '@/utils/breadcrumb'
+import apiClient from '@/services/api.service'
 
 export default {
   name: 'DashboardPage',
@@ -214,14 +215,7 @@ export default {
         totalFactories: 0,
         totalDocuments: 0
       },
-      activities: [],
-      // Dữ liệu mẫu cho activities
-      sampleActivities: [
-        { type: 'employee', description: 'Nhân viên Nguyễn Văn A đã được thêm mới', timestamp: new Date(Date.now() - 3600000) },
-        { type: 'document', description: 'Tài liệu "Quy trình tuyển dụng" đã được cập nhật', timestamp: new Date(Date.now() - 7200000) },
-        { type: 'department', description: 'Phòng Nhân sự đã được cập nhật thông tin', timestamp: new Date(Date.now() - 86400000) },
-        { type: 'login', description: 'Bạn đã đăng nhập vào hệ thống', timestamp: new Date() }
-      ]
+      activities: []
     }
   },
   computed: {
@@ -240,22 +234,36 @@ export default {
       this.loading = true
 
       try {
-        // Trong thực tế, bạn sẽ gọi API để lấy dữ liệu
-        // Ở đây chúng ta sử dụng dữ liệu mẫu
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        // Gọi API để lấy dữ liệu thống kê
+        const [employeesResponse, departmentsResponse, factoriesResponse, documentsResponse, activitiesResponse] = await Promise.all([
+          apiClient.get('/employees/'),
+          apiClient.get('/departments/'),
+          apiClient.get('/factories/'),
+          apiClient.get('/documents/'),
+          apiClient.get('/dashboard/activities/')
+        ]);
 
+        // Cập nhật thống kê
         this.stats = {
-          totalEmployees: 125,
-          totalDepartments: 12,
-          totalFactories: 5,
-          totalDocuments: 48
+          totalEmployees: employeesResponse.data.count || employeesResponse.data.results.length,
+          totalDepartments: departmentsResponse.data.count || departmentsResponse.data.results.length,
+          totalFactories: factoriesResponse.data.count || factoriesResponse.data.results.length,
+          totalDocuments: documentsResponse.data.count || documentsResponse.data.results.length
         }
 
-        this.activities = this.sampleActivities
+        // Cập nhật hoạt động gần đây
+        if (activitiesResponse.data.results) {
+          this.activities = activitiesResponse.data.results;
+        } else {
+          // Không có dữ liệu hoạt động
+          this.activities = [];
+        }
       } catch (error) {
-        console.error('Error fetching dashboard data:', error)
+        console.error('Error fetching dashboard data:', error);
+        // Xử lý lỗi và hiển thị thông báo cho người dùng
+        this.$store.dispatch('setError', 'Không thể tải dữ liệu bảng điều khiển. Vui lòng thử lại sau.');
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
     refreshData() {

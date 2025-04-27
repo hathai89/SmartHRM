@@ -123,8 +123,13 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
+                'django.template.context_processors.static',
                 'app_settings.context_processors.export_settings',
                 'company.context_processors.company_info',
+                'smarthrm.context_processors.vue_settings',
+            ],
+            'builtins': [
+                'django.templatetags.static',
             ],
         },
     },
@@ -136,15 +141,11 @@ WSGI_APPLICATION = 'smarthrm.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# Cấu hình kết nối PostgreSQL
+# Cấu hình kết nối SQLite
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'smarthrm',
-        'USER': 'ha',  # Thay đổi thành tên người dùng PostgreSQL của bạn
-        'PASSWORD': '',  # Để trống nếu không có mật khẩu
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -191,11 +192,15 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
+    BASE_DIR / 'static/vue',  # Vue.js build output
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Cấu hình để phục vụ Vue.js SPA
+VUE_STATIC_DIR = BASE_DIR / 'static/vue'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 

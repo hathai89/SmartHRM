@@ -3,19 +3,50 @@ const webpack = require('webpack')
 
 module.exports = defineConfig({
   transpileDependencies: true,
+
   // Đặt đường dẫn tương đối cho các tài nguyên tĩnh
   publicPath: process.env.NODE_ENV === 'production' ? '/static/vue/' : '/',
 
   // Cấu hình output khi build
   outputDir: '../static/vue',
 
-  // Cấu hình proxy cho API
+  // Tách các chunks
+  filenameHashing: true,
+
+  // Cấu hình proxy cho API trong development
   devServer: {
+    port: 8080,
     proxy: {
       '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true
+      },
+      '/media': {
+        target: 'http://localhost:8000',
+        changeOrigin: true
+      },
+      '/static': {
+        target: 'http://localhost:8000',
+        changeOrigin: true
       }
+    },
+    // Cấu hình history mode cho Vue Router
+    historyApiFallback: {
+      rewrites: [
+        { from: /^\/dashboard/, to: '/index.html' },
+        { from: /^\/company/, to: '/index.html' },
+        { from: /^\/departments/, to: '/index.html' },
+        { from: /^\/factories/, to: '/index.html' },
+        { from: /^\/employees/, to: '/index.html' },
+        { from: /^\/documents/, to: '/index.html' },
+        { from: /^\/recruitment/, to: '/index.html' },
+        { from: /^\/assets/, to: '/index.html' },
+        { from: /^\/notifications/, to: '/index.html' },
+        { from: /^\/profile/, to: '/index.html' },
+        { from: /^\/settings/, to: '/index.html' },
+        { from: /^\/login/, to: '/index.html' },
+        { from: /./, to: '/index.html' }
+      ]
     }
   },
 
@@ -42,6 +73,29 @@ module.exports = defineConfig({
         __VUE_PROD_DEVTOOLS__: false,
         __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false
       })
-    ]
+    ],
+    // Tối ưu hóa bundle
+    optimization: {
+      splitChunks: {
+        chunks: 'all',
+        minSize: 20000,
+        maxSize: 250000,
+        cacheGroups: {
+          vendors: {
+            name: 'chunk-vendors',
+            test: /[\\/]node_modules[\\/]/,
+            priority: -10,
+            chunks: 'initial'
+          },
+          common: {
+            name: 'chunk-common',
+            minChunks: 2,
+            priority: -20,
+            chunks: 'initial',
+            reuseExistingChunk: true
+          }
+        }
+      }
+    }
   }
 })

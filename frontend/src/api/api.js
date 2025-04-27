@@ -2,8 +2,17 @@
  * API endpoints configuration
  */
 
-// Base API URL
-export const API_BASE_URL = process.env.VUE_APP_API_URL || 'http://localhost:8000/api';
+// Determine the API base URL
+let apiBaseUrl = process.env.VUE_APP_API_URL || '/api';
+
+// Detect if we're running in Django's template environment
+if (typeof window !== 'undefined' && window.DJANGO_SETTINGS) {
+  // Use the API URL provided by Django
+  apiBaseUrl = window.DJANGO_SETTINGS.API_URL;
+}
+
+// Export the API base URL
+export const API_BASE_URL = apiBaseUrl;
 
 // Auth endpoints
 export const AUTH_ENDPOINTS = {

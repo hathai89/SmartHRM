@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>SmartHRM - Hệ thống quản lý nhân sự</title>
+    <meta name="description" content="SmartHRM - Hệ thống quản lý nhân sự thông minh">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <link rel="icon" href="{% static 'vue/favicon.ico' %}">
+    {% if debug %}
+        <!-- Development mode - load from Vue dev server -->
+        <script>
+            window.DJANGO_SETTINGS = {
+                API_URL: "{% url 'api-root' %}",
+                MEDIA_URL: "{{ MEDIA_URL }}",
+                STATIC_URL: "{{ STATIC_URL }}",
+                CSRF_TOKEN: "{{ csrf_token }}",
+                DEBUG: {{ debug|yesno:"true,false" }}
+            };
+        </script>
+    {% else %}
+        <!-- Production mode - load from static files -->
+        <link href="{% static 'vue/css/app.css' %}" rel="stylesheet">
+        <script>
+            window.DJANGO_SETTINGS = {
+                API_URL: "{% url 'api-root' %}",
+                MEDIA_URL: "{{ MEDIA_URL }}",
+                STATIC_URL: "{{ STATIC_URL }}",
+                CSRF_TOKEN: "{{ csrf_token }}",
+                DEBUG: {{ debug|yesno:"true,false" }}
+            };
+        </script>
+    {% endif %}
+</head>
+<body>
+    <noscript>
+        <strong>Rất tiếc, SmartHRM không hoạt động nếu không bật JavaScript. Vui lòng bật JavaScript để tiếp tục.</strong>
+    </noscript>
+    <div id="app"></div>
+    
+    {% if debug %}
+        <!-- Development mode - load from Vue dev server -->
+        <script type="module" src="http://localhost:8080/js/app.js"></script>
+    {% else %}
+        <!-- Production mode - load from static files -->
+        <script src="{% static 'vue/js/chunk-vendors.js' %}"></script>
+        <script src="{% static 'vue/js/app.js' %}"></script>
+    {% endif %}
+</body>
+</html>

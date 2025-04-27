@@ -1,4 +1,4 @@
-import axios from './axios';
+import api from './api.service';
 import { COMPANY_ENDPOINTS } from '@/api/api';
 
 /**
@@ -10,7 +10,7 @@ class CompanyService {
    * @returns {Promise} - Promise chứa thông tin công ty
    */
   getCompanyInfo() {
-    return axios.get(COMPANY_ENDPOINTS.INFO);
+    return api.get(COMPANY_ENDPOINTS.INFO);
   }
 }
 

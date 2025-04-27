@@ -6,6 +6,7 @@ from api.views.department import DepartmentViewSet, PhongBanViewSet, BoPhanViewS
 from api.views.factory import FactoryViewSet, XiNghiepViewSet, BoPhanXiNghiepViewSet, NhomXiNghiepViewSet
 from api.views.document import DocumentViewSet, DocumentCategoryViewSet
 from api.views.notification import NotificationViewSet
+from api.views.dashboard import DashboardViewSet
 from api.views.csrf import CsrfViewSet
 from company.api import CompanyViewSet
 
@@ -29,6 +30,7 @@ router.register(r'document-categories', DocumentCategoryViewSet)
 router.register(r'notifications', NotificationViewSet, basename='notification')
 router.register(r'csrf', CsrfViewSet, basename='csrf')
 router.register(r'company', CompanyViewSet, basename='company')
+router.register(r'dashboard', DashboardViewSet, basename='dashboard')
 
 urlpatterns = [
     path('', include(router.urls)),

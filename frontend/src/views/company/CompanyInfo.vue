@@ -20,16 +20,16 @@
         <div class="card-body">
           <div class="row">
             <div class="col-md-3 text-center mb-4 mb-md-0">
-              <img 
-                v-if="company.logo" 
-                :src="company.logo" 
-                :alt="company.name" 
-                class="img-fluid mb-3" 
+              <img
+                v-if="company.logo"
+                :src="company.logo"
+                :alt="company.name"
+                class="img-fluid mb-3"
                 style="max-height: 150px;"
               >
-              <div 
-                v-else 
-                class="bg-light d-flex align-items-center justify-content-center" 
+              <div
+                v-else
+                class="bg-light d-flex align-items-center justify-content-center"
                 style="height: 150px; width: 100%;"
               >
                 <i class="fas fa-building fa-4x text-muted"></i>
@@ -148,7 +148,7 @@
 import { ref, onMounted } from 'vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { COMPANY_ENDPOINTS } from '@/api/api';
-import axios from '@/services/axios';
+import api from '@/services/api.service';
 import { breadcrumbMixin } from '@/utils/breadcrumb';
 
 export default {
@@ -165,7 +165,7 @@ export default {
     const fetchCompanyInfo = async () => {
       try {
         loading.value = true;
-        const response = await axios.get(COMPANY_ENDPOINTS.INFO);
+        const response = await api.get(COMPANY_ENDPOINTS.INFO);
         company.value = response.data;
       } catch (err) {
         console.error('Error fetching company info:', err);
@@ -208,7 +208,7 @@ export default {
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    
+
     .card-header {
       background: linear-gradient(90deg, var(--primary-color, #003366) 0%, var(--accent-color, #ff6600) 100%);
       color: white;

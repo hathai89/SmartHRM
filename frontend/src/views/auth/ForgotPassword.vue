@@ -106,11 +106,12 @@ export default {
 
       try {
         // Gọi API để gửi email đặt lại mật khẩu
+        // Trong thực tế, bạn sẽ gọi API để gửi email đặt lại mật khẩu
         // await authService.resetPassword(this.email)
-        
+
         // Giả lập API call thành công
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
+
         this.success = 'Một email đã được gửi đến địa chỉ của bạn với hướng dẫn đặt lại mật khẩu.'
         this.email = '' // Xóa email sau khi gửi thành công
       } catch (error) {
@@ -130,24 +131,24 @@ export default {
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--primary-color, #003366) 0%, var(--primary-light, #0066cc) 100%);
-  
+
   .card {
     border: none;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    
+
     .card-header {
       background: white;
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-      
+
       h4 {
         color: var(--primary-color, #003366);
         font-size: 1.2rem;
         font-weight: 600;
       }
     }
-    
+
     .card-body {
       background: white;
     }
@@ -158,24 +159,24 @@ export default {
   width: 100%;
   max-width: 400px;
   padding: 15px;
-  
+
   .btn-primary {
     background: linear-gradient(90deg, var(--primary-color, #003366) 0%, var(--accent-color, #ff6600) 100%);
     border: none;
     padding: 0.75rem;
     font-weight: 500;
     transition: all 0.3s ease;
-    
+
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
   }
-  
+
   a {
     color: var(--accent-color, #ff6600);
     text-decoration: none;
-    
+
     &:hover {
       text-decoration: underline;
     }

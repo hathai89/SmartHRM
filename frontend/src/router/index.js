@@ -15,6 +15,7 @@ const DepartmentList = () => import('@/views/departments/DepartmentList.vue')
 const FactoryList = () => import('@/views/factories/FactoryList.vue')
 const DocumentList = () => import('@/views/documents/DocumentList.vue')
 const Settings = () => import('@/views/settings/Settings.vue')
+const Notifications = () => import('@/views/notifications/Notifications.vue')
 const CompanyInfo = () => import('@/views/company/CompanyInfo.vue')
 const NotFound = () => import('@/views/errors/NotFound.vue')
 
@@ -114,6 +115,12 @@ const routes = [
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
+    path: '/notifications',
+    name: 'notifications',
+    component: Notifications,
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: NotFound
@@ -121,7 +128,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(process.env.NODE_ENV === 'production' ? '/' : process.env.BASE_URL),
   routes,
   scrollBehavior() {
     // Luôn cuộn lên đầu trang khi chuyển trang
@@ -132,16 +139,25 @@ const router = createRouter({
 // Navigation guard
 router.beforeEach((to, from, next) => {
   const isAuthenticated = store.getters['auth/isAuthenticated']
+  const user = store.getters['auth/user']
+  const isAdmin = user && user.is_staff
 
   // Kiểm tra xem route có yêu cầu xác thực không
   if (to.meta.requiresAuth && !isAuthenticated) {
     // Nếu route yêu cầu xác thực và người dùng chưa đăng nhập, chuyển hướng đến trang đăng nhập
     next({ name: 'login', query: { redirect: to.fullPath } })
-  } else if (to.name === 'login' && isAuthenticated) {
-    // Nếu người dùng đã đăng nhập và cố gắng truy cập trang đăng nhập, chuyển hướng đến trang chủ
+  }
+  // Kiểm tra xem route có yêu cầu quyền admin không
+  else if (to.meta.requiresAdmin && !isAdmin) {
+    // Nếu route yêu cầu quyền admin và người dùng không phải admin, chuyển hướng đến trang chủ
     next({ name: 'dashboard' })
-  } else {
-    // Trong các trường hợp khác, cho phép truy cập
+  }
+  // Nếu người dùng đã đăng nhập và cố gắng truy cập trang đăng nhập, chuyển hướng đến trang chủ
+  else if (to.name === 'login' && isAuthenticated) {
+    next({ name: 'dashboard' })
+  }
+  // Trong các trường hợp khác, cho phép truy cập
+  else {
     next()
   }
 })

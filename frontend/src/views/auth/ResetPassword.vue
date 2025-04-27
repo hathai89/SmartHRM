@@ -52,7 +52,7 @@
               </div>
               <div class="form-text" v-if="password">
                 <div :class="{'text-success': isStrongPassword, 'text-danger': !isStrongPassword}">
-                  <font-awesome-icon :icon="isStrongPassword ? 'check' : 'times'" /> 
+                  <font-awesome-icon :icon="isStrongPassword ? 'check' : 'times'" />
                   Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt
                 </div>
               </div>
@@ -82,7 +82,7 @@
               </div>
               <div class="form-text" v-if="confirmPassword">
                 <div :class="{'text-success': passwordsMatch, 'text-danger': !passwordsMatch}">
-                  <font-awesome-icon :icon="passwordsMatch ? 'check' : 'times'" /> 
+                  <font-awesome-icon :icon="passwordsMatch ? 'check' : 'times'" />
                   Mật khẩu xác nhận phải trùng khớp
                 </div>
               </div>
@@ -190,15 +190,16 @@ export default {
 
       try {
         // Gọi API để đặt lại mật khẩu
-        // await authService.confirmResetPassword({
-        //   uid: this.uid,
-        //   token: this.token,
-        //   new_password: this.password
-        // })
-        
+        // Trong thực tế, bạn sẽ gọi API để đặt lại mật khẩu
+        // await authService.resetPasswordConfirm(
+        //   this.uid,
+        //   this.token,
+        //   this.password
+        // )
+
         // Giả lập API call thành công
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
+
         this.success = 'Mật khẩu của bạn đã được đặt lại thành công.'
         this.password = ''
         this.confirmPassword = ''
@@ -219,24 +220,24 @@ export default {
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--primary-color, #003366) 0%, var(--primary-light, #0066cc) 100%);
-  
+
   .card {
     border: none;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    
+
     .card-header {
       background: white;
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-      
+
       h4 {
         color: var(--primary-color, #003366);
         font-size: 1.2rem;
         font-weight: 600;
       }
     }
-    
+
     .card-body {
       background: white;
     }
@@ -247,30 +248,30 @@ export default {
   width: 100%;
   max-width: 400px;
   padding: 15px;
-  
+
   .btn-primary {
     background: linear-gradient(90deg, var(--primary-color, #003366) 0%, var(--accent-color, #ff6600) 100%);
     border: none;
     padding: 0.75rem;
     font-weight: 500;
     transition: all 0.3s ease;
-    
+
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
-    
+
     &:disabled {
       background: #6c757d;
       transform: none;
       box-shadow: none;
     }
   }
-  
+
   a {
     color: var(--accent-color, #ff6600);
     text-decoration: none;
-    
+
     &:hover {
       text-decoration: underline;
     }
