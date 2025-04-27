@@ -563,11 +563,12 @@ export default {
             }
 
             .notification-badge {
-              background-color: var(--primary-color, #003366);
+              background-color: var(--accent, #ff7f50);
               color: white;
               font-size: 0.75rem;
               padding: 0.25rem 0.5rem;
-              border-radius: 20px;
+              border-radius: 4px;
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             }
           }
         }

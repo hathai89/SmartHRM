@@ -299,57 +299,15 @@ export default {
       selectedFactory: null,
       showDeleteConfirm: false,
       factoryToDelete: null,
-      // Dữ liệu mẫu
-      factories: [
-        {
-          id: 1,
-          code: 'XN1',
-          name: 'Xí nghiệp 1',
-          manager: 'Nguyễn Văn A',
-          manager_id: 1,
-          address: 'Số 123, Đường ABC, Quận XYZ, TP. Hồ Chí Minh',
-          description: 'Xí nghiệp sản xuất hàng may mặc xuất khẩu',
-          employee_count: 120,
-          created_at: '2023-01-01T00:00:00Z',
-          updated_at: '2023-01-01T00:00:00Z'
-        },
-        {
-          id: 2,
-          code: 'XN2',
-          name: 'Xí nghiệp 2',
-          manager: 'Trần Thị B',
-          manager_id: 2,
-          address: 'Số 456, Đường DEF, Quận UVW, TP. Hồ Chí Minh',
-          description: 'Xí nghiệp sản xuất hàng may mặc nội địa',
-          employee_count: 85,
-          created_at: '2023-01-01T00:00:00Z',
-          updated_at: '2023-01-01T00:00:00Z'
-        },
-        {
-          id: 3,
-          code: 'XN3',
-          name: 'Xí nghiệp 3',
-          manager: 'Lê Văn C',
-          manager_id: 3,
-          address: 'Số 789, Đường GHI, Quận RST, TP. Hồ Chí Minh',
-          description: 'Xí nghiệp sản xuất nguyên phụ liệu',
-          employee_count: 65,
-          created_at: '2023-01-01T00:00:00Z',
-          updated_at: '2023-01-01T00:00:00Z'
-        }
-      ],
-      employees: [
-        { id: 1, full_name: 'Nguyễn Văn A' },
-        { id: 2, full_name: 'Trần Thị B' },
-        { id: 3, full_name: 'Lê Văn C' },
-        { id: 4, full_name: 'Phạm Thị D' }
-      ]
+      factories: [],
+      employees: []
     }
   },
   computed: {
     ...mapGetters({
-      // factoriesData: 'factories/allFactories',
-      // isLoading: 'factories/isLoading'
+      factoriesData: 'factories/allFactories',
+      isLoading: 'factories/isLoading',
+      employeesData: 'employees/allEmployees'
     }),
     filteredFactories() {
       if (!this.searchQuery) {
@@ -372,10 +330,11 @@ export default {
   },
   methods: {
     ...mapActions({
-      // fetchAllFactories: 'factories/fetchFactories',
-      // createFactory: 'factories/createFactory',
-      // updateFactory: 'factories/updateFactory',
-      // removeFactory: 'factories/deleteFactory',
+      fetchAllFactories: 'factories/fetchFactories',
+      createFactory: 'factories/createFactory',
+      updateFactory: 'factories/updateFactory',
+      removeFactory: 'factories/deleteFactory',
+      fetchAllEmployees: 'employees/fetchEmployees',
       setError: 'setError',
       clearError: 'clearError',
       setSuccess: 'setSuccess',
@@ -392,11 +351,18 @@ export default {
       this.loading = true
 
       try {
-        // Trong thực tế, bạn sẽ gọi API để lấy dữ liệu
-        // await this.fetchAllFactories()
+        // Lấy danh sách xí nghiệp từ API
+        await this.fetchAllFactories()
 
-        // Giả lập API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        // Lấy danh sách nhân viên để hiển thị tên quản đốc
+        await this.fetchAllEmployees({
+          page: 1,
+          limit: 100 // Lấy đủ nhân viên để có thể chọn làm quản đốc
+        })
+
+        // Cập nhật dữ liệu local từ store
+        this.factories = this.factoriesData
+        this.employees = this.employeesData
       } catch (error) {
         console.error('Error fetching factories:', error)
         this.setError('Không thể tải danh sách xí nghiệp. Vui lòng thử lại sau.')
@@ -460,49 +426,17 @@ export default {
         const factoryData = { ...this.formData }
 
         if (this.isEdit) {
-          // Cập nhật xí nghiệp
-          // await this.updateFactory({ id: factoryData.id, data: factoryData })
-
-          // Giả lập API call
-          await new Promise(resolve => setTimeout(resolve, 1000))
-
-          // Cập nhật dữ liệu trong danh sách
-          const index = this.factories.findIndex(f => f.id === factoryData.id)
-          if (index !== -1) {
-            // Tìm tên quản đốc
-            const manager = this.employees.find(e => e.id === factoryData.manager_id)
-
-            this.factories[index] = {
-              ...this.factories[index],
-              ...factoryData,
-              manager: manager ? manager.full_name : null,
-              updated_at: new Date().toISOString()
-            }
-          }
-
+          // Cập nhật xí nghiệp qua API
+          await this.updateFactory({ id: factoryData.id, data: factoryData })
           this.setSuccess('Cập nhật xí nghiệp thành công.')
         } else {
-          // Thêm xí nghiệp mới
-          // await this.createFactory(factoryData)
-
-          // Giả lập API call
-          await new Promise(resolve => setTimeout(resolve, 1000))
-
-          // Tìm tên quản đốc
-          const manager = this.employees.find(e => e.id === factoryData.manager_id)
-
-          // Thêm vào danh sách
-          this.factories.push({
-            id: this.factories.length + 1,
-            ...factoryData,
-            manager: manager ? manager.full_name : null,
-            employee_count: 0,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          })
-
+          // Thêm xí nghiệp mới qua API
+          await this.createFactory(factoryData)
           this.setSuccess('Thêm xí nghiệp mới thành công.')
         }
+
+        // Cập nhật lại danh sách xí nghiệp từ API
+        await this.fetchFactories()
 
         // Đóng modal
         this.factoryModal.hide()
@@ -525,14 +459,11 @@ export default {
       this.loading = true
 
       try {
-        // Trong thực tế, bạn sẽ gọi API để xóa xí nghiệp
-        // await this.removeFactory(this.factoryToDelete.id)
+        // Gọi API để xóa xí nghiệp
+        await this.removeFactory(this.factoryToDelete.id)
 
-        // Giả lập API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        // Xóa xí nghiệp khỏi danh sách
-        this.factories = this.factories.filter(f => f.id !== this.factoryToDelete.id)
+        // Cập nhật lại danh sách xí nghiệp từ API
+        await this.fetchFactories()
 
         // Hiển thị thông báo thành công
         this.setSuccess(`Đã xóa xí nghiệp ${this.factoryToDelete.name} thành công`)

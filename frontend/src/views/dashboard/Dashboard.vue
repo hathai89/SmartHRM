@@ -175,7 +175,7 @@
                         <small class="text-muted">{{ formatDate(notification.created_at) }}</small>
                       </div>
                       <div v-if="!notification.is_read" class="flex-shrink-0 ms-3">
-                        <span class="badge bg-primary">Mới</span>
+                        <span class="badge bg-primary" style="border-radius: 4px;">Mới</span>
                       </div>
                     </div>
                   </li>

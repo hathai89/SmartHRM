@@ -391,82 +391,15 @@ export default {
       selectedDocument: null,
       showDeleteConfirm: false,
       documentToDelete: null,
-      // Dữ liệu mẫu
-      documents: [
-        {
-          id: 1,
-          name: 'Quy trình sản xuất 2023',
-          category_id: 1,
-          description: 'Tài liệu mô tả quy trình sản xuất áp dụng từ tháng 1/2023',
-          file_type: 'PDF',
-          file_size: 2500000,
-          file_url: '/documents/quy-trinh-san-xuat-2023.pdf',
-          uploaded_by: 'Nguyễn Văn A',
-          upload_date: '2023-01-15T00:00:00Z',
-          last_modified: '2023-01-15T00:00:00Z'
-        },
-        {
-          id: 2,
-          name: 'Báo cáo tài chính Q1 2023',
-          category_id: 2,
-          description: 'Báo cáo tài chính quý 1 năm 2023',
-          file_type: 'XLSX',
-          file_size: 1800000,
-          file_url: '/documents/bao-cao-tai-chinh-q1-2023.xlsx',
-          uploaded_by: 'Trần Thị B',
-          upload_date: '2023-04-10T00:00:00Z',
-          last_modified: '2023-04-12T00:00:00Z'
-        },
-        {
-          id: 3,
-          name: 'Nội quy công ty',
-          category_id: 3,
-          description: 'Nội quy công ty cập nhật mới nhất',
-          file_type: 'DOCX',
-          file_size: 1200000,
-          file_url: '/documents/noi-quy-cong-ty.docx',
-          uploaded_by: 'Lê Văn C',
-          upload_date: '2023-02-20T00:00:00Z',
-          last_modified: '2023-03-05T00:00:00Z'
-        },
-        {
-          id: 4,
-          name: 'Kế hoạch kinh doanh 2023',
-          category_id: 4,
-          description: 'Kế hoạch kinh doanh năm 2023',
-          file_type: 'PPTX',
-          file_size: 3500000,
-          file_url: '/documents/ke-hoach-kinh-doanh-2023.pptx',
-          uploaded_by: 'Phạm Thị D',
-          upload_date: '2023-01-05T00:00:00Z',
-          last_modified: '2023-01-10T00:00:00Z'
-        },
-        {
-          id: 5,
-          name: 'Hướng dẫn sử dụng phần mềm',
-          category_id: 5,
-          description: 'Tài liệu hướng dẫn sử dụng phần mềm quản lý',
-          file_type: 'PDF',
-          file_size: 4200000,
-          file_url: '/documents/huong-dan-su-dung-phan-mem.pdf',
-          uploaded_by: 'Nguyễn Văn A',
-          upload_date: '2023-03-15T00:00:00Z',
-          last_modified: '2023-03-15T00:00:00Z'
-        }
-      ],
-      categories: [
-        { id: 1, name: 'Quy trình sản xuất' },
-        { id: 2, name: 'Tài chính' },
-        { id: 3, name: 'Nhân sự' },
-        { id: 4, name: 'Kinh doanh' },
-        { id: 5, name: 'Công nghệ' }
-      ]
+      documents: [],
+      categories: []
     }
   },
   computed: {
     ...mapGetters({
-      // documentsData: 'documents/allDocuments',
-      // isLoading: 'documents/isLoading'
+      documentsData: 'documents/allDocuments',
+      categoriesData: 'documents/allCategories',
+      isLoading: 'documents/isLoading'
     }),
     filteredDocuments() {
       let result = [...this.documents]
@@ -512,10 +445,11 @@ export default {
   },
   methods: {
     ...mapActions({
-      // fetchAllDocuments: 'documents/fetchDocuments',
-      // uploadNewDocument: 'documents/uploadDocument',
-      // updateDocumentInfo: 'documents/updateDocument',
-      // removeDocument: 'documents/deleteDocument',
+      fetchAllDocuments: 'documents/fetchDocuments',
+      fetchAllCategories: 'documents/fetchCategories',
+      uploadNewDocument: 'documents/uploadDocument',
+      updateDocumentInfo: 'documents/updateDocument',
+      removeDocument: 'documents/deleteDocument',
       setError: 'setError',
       clearError: 'clearError',
       setSuccess: 'setSuccess',

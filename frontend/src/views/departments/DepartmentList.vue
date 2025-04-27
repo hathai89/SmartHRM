@@ -281,65 +281,15 @@ export default {
       selectedDepartment: null,
       showDeleteConfirm: false,
       departmentToDelete: null,
-      // Dữ liệu mẫu
-      departments: [
-        {
-          id: 1,
-          code: 'NS',
-          name: 'Phòng Nhân sự',
-          manager: 'Nguyễn Văn A',
-          manager_id: 1,
-          description: 'Phòng quản lý nhân sự của công ty',
-          employee_count: 5,
-          created_at: '2023-01-01T00:00:00Z',
-          updated_at: '2023-01-01T00:00:00Z'
-        },
-        {
-          id: 2,
-          code: 'KT',
-          name: 'Phòng Kế toán',
-          manager: 'Trần Thị B',
-          manager_id: 2,
-          description: 'Phòng quản lý tài chính, kế toán của công ty',
-          employee_count: 3,
-          created_at: '2023-01-01T00:00:00Z',
-          updated_at: '2023-01-01T00:00:00Z'
-        },
-        {
-          id: 3,
-          code: 'KTH',
-          name: 'Phòng Kỹ thuật',
-          manager: 'Lê Văn C',
-          manager_id: 3,
-          description: 'Phòng quản lý kỹ thuật, công nghệ của công ty',
-          employee_count: 8,
-          created_at: '2023-01-01T00:00:00Z',
-          updated_at: '2023-01-01T00:00:00Z'
-        },
-        {
-          id: 4,
-          code: 'KD',
-          name: 'Phòng Kinh doanh',
-          manager: 'Phạm Thị D',
-          manager_id: 4,
-          description: 'Phòng quản lý kinh doanh, bán hàng của công ty',
-          employee_count: 6,
-          created_at: '2023-01-01T00:00:00Z',
-          updated_at: '2023-01-01T00:00:00Z'
-        }
-      ],
-      employees: [
-        { id: 1, full_name: 'Nguyễn Văn A' },
-        { id: 2, full_name: 'Trần Thị B' },
-        { id: 3, full_name: 'Lê Văn C' },
-        { id: 4, full_name: 'Phạm Thị D' }
-      ]
+      departments: [],
+      employees: []
     }
   },
   computed: {
     ...mapGetters({
-      // departmentsData: 'departments/allDepartments',
-      // isLoading: 'departments/isLoading'
+      departmentsData: 'departments/allDepartments',
+      isLoading: 'departments/isLoading',
+      employeesData: 'employees/allEmployees'
     }),
     filteredDepartments() {
       if (!this.searchQuery) {
@@ -361,10 +311,11 @@ export default {
   },
   methods: {
     ...mapActions({
-      // fetchAllDepartments: 'departments/fetchDepartments',
-      // createDepartment: 'departments/createDepartment',
-      // updateDepartment: 'departments/updateDepartment',
-      // removeDepartment: 'departments/deleteDepartment',
+      fetchAllDepartments: 'departments/fetchDepartments',
+      createDepartment: 'departments/createDepartment',
+      updateDepartment: 'departments/updateDepartment',
+      removeDepartment: 'departments/deleteDepartment',
+      fetchAllEmployees: 'employees/fetchEmployees',
       setError: 'setError',
       clearError: 'clearError',
       setSuccess: 'setSuccess',
@@ -381,11 +332,18 @@ export default {
       this.loading = true
 
       try {
-        // Trong thực tế, bạn sẽ gọi API để lấy dữ liệu
-        // await this.fetchAllDepartments()
+        // Lấy danh sách phòng ban từ API
+        await this.fetchAllDepartments()
 
-        // Giả lập API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        // Lấy danh sách nhân viên để hiển thị tên trưởng phòng
+        await this.fetchAllEmployees({
+          page: 1,
+          limit: 100 // Lấy đủ nhân viên để có thể chọn làm trưởng phòng
+        })
+
+        // Cập nhật dữ liệu local từ store
+        this.departments = this.departmentsData
+        this.employees = this.employeesData
       } catch (error) {
         console.error('Error fetching departments:', error)
         this.setError('Không thể tải danh sách phòng ban. Vui lòng thử lại sau.')
@@ -447,49 +405,17 @@ export default {
         const departmentData = { ...this.formData }
 
         if (this.isEdit) {
-          // Cập nhật phòng ban
-          // await this.updateDepartment({ id: departmentData.id, data: departmentData })
-
-          // Giả lập API call
-          await new Promise(resolve => setTimeout(resolve, 1000))
-
-          // Cập nhật dữ liệu trong danh sách
-          const index = this.departments.findIndex(d => d.id === departmentData.id)
-          if (index !== -1) {
-            // Tìm tên trưởng phòng
-            const manager = this.employees.find(e => e.id === departmentData.manager_id)
-
-            this.departments[index] = {
-              ...this.departments[index],
-              ...departmentData,
-              manager: manager ? manager.full_name : null,
-              updated_at: new Date().toISOString()
-            }
-          }
-
+          // Cập nhật phòng ban qua API
+          await this.updateDepartment({ id: departmentData.id, data: departmentData })
           this.setSuccess('Cập nhật phòng ban thành công.')
         } else {
-          // Thêm phòng ban mới
-          // await this.createDepartment(departmentData)
-
-          // Giả lập API call
-          await new Promise(resolve => setTimeout(resolve, 1000))
-
-          // Tìm tên trưởng phòng
-          const manager = this.employees.find(e => e.id === departmentData.manager_id)
-
-          // Thêm vào danh sách
-          this.departments.push({
-            id: this.departments.length + 1,
-            ...departmentData,
-            manager: manager ? manager.full_name : null,
-            employee_count: 0,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          })
-
+          // Thêm phòng ban mới qua API
+          await this.createDepartment(departmentData)
           this.setSuccess('Thêm phòng ban mới thành công.')
         }
+
+        // Cập nhật lại danh sách phòng ban từ API
+        await this.fetchDepartments()
 
         // Đóng modal
         this.departmentModal.hide()
@@ -512,14 +438,11 @@ export default {
       this.loading = true
 
       try {
-        // Trong thực tế, bạn sẽ gọi API để xóa phòng ban
-        // await this.removeDepartment(this.departmentToDelete.id)
+        // Gọi API để xóa phòng ban
+        await this.removeDepartment(this.departmentToDelete.id)
 
-        // Giả lập API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        // Xóa phòng ban khỏi danh sách
-        this.departments = this.departments.filter(d => d.id !== this.departmentToDelete.id)
+        // Cập nhật lại danh sách phòng ban từ API
+        await this.fetchDepartments()
 
         // Hiển thị thông báo thành công
         this.setSuccess(`Đã xóa phòng ban ${this.departmentToDelete.name} thành công`)

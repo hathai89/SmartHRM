@@ -3,7 +3,7 @@
     <div class="sidebar-header">
       <h5 class="mb-0">{{ $t('common.appName') }}</h5>
     </div>
-    
+
     <ul class="sidebar-menu">
       <!-- Dashboard -->
       <li>
@@ -12,7 +12,7 @@
           {{ $t('dashboard.title') }}
         </router-link>
       </li>
-      
+
       <!-- Nhân viên -->
       <li class="menu-header">{{ $t('employees.title') }}</li>
       <li>
@@ -27,7 +27,7 @@
           {{ $t('employees.create') }}
         </router-link>
       </li>
-      
+
       <!-- Phòng ban -->
       <li class="menu-header">{{ $t('departments.title') }}</li>
       <li>
@@ -42,7 +42,7 @@
           {{ $t('departments.create') }}
         </router-link>
       </li>
-      
+
       <!-- Xí nghiệp -->
       <li class="menu-header">{{ $t('factories.title') }}</li>
       <li>
@@ -57,7 +57,7 @@
           {{ $t('factories.create') }}
         </router-link>
       </li>
-      
+
       <!-- Tài liệu -->
       <li class="menu-header">{{ $t('documents.title') }}</li>
       <li>
@@ -78,7 +78,7 @@
           {{ $t('documents.categories.title') }}
         </router-link>
       </li>
-      
+
       <!-- Quản trị hệ thống (chỉ cho admin) -->
       <li v-if="isAdmin" class="menu-header">{{ $t('admin.title') }}</li>
       <li v-if="isAdmin">
@@ -120,3 +120,87 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.sidebar {
+  position: fixed;
+  top: 60px; /* Chiều cao của header */
+  left: 0;
+  bottom: 0;
+  width: 250px;
+  background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 900;
+  transition: all 0.3s ease;
+  overflow-y: auto;
+  transform: translateX(-100%);
+
+  @media (min-width: 768px) {
+    transform: translateX(0);
+  }
+
+  &.show {
+    transform: translateX(0);
+  }
+
+  .sidebar-header {
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+    h5 {
+      font-weight: 600;
+      color: var(--primary);
+      margin: 0;
+    }
+  }
+
+  .sidebar-menu {
+    padding: 1rem 0;
+
+    .menu-header {
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #6c757d;
+      margin-top: 1rem;
+    }
+
+    li {
+      a {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        color: #343a40;
+        transition: all 0.2s ease;
+
+        &:hover, &.active {
+          background-color: rgba(0, 51, 102, 0.05);
+          color: var(--primary);
+          border-left: 3px solid var(--primary);
+        }
+
+        svg {
+          width: 20px;
+          margin-right: 0.75rem;
+          color: #6c757d;
+        }
+
+        &.active svg {
+          color: var(--primary);
+        }
+      }
+    }
+  }
+}
+
+// CSS Variables
+:root {
+  --primary: #003366;
+  --primary-dark: #001f3f;
+  --accent: #ff6600;
+}
+
+// No need for this anymore as we handle it in AppLayout.vue
+</style>

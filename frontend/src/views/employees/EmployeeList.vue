@@ -133,6 +133,7 @@
                       'bg-warning': employee.status === 'probation',
                       'bg-danger': employee.status === 'terminated'
                     }"
+                    style="border-radius: 4px; padding: 5px 8px;"
                   >
                     {{ getStatusText(employee.status) }}
                   </span>
@@ -244,111 +245,18 @@ export default {
       perPage: 10,
       showDeleteConfirm: false,
       employeeToDelete: null,
-      // Dữ liệu mẫu
-      employees: [
-        {
-          id: 1,
-          employee_id: 'NV001',
-          first_name: 'Nguyễn',
-          last_name: 'Văn A',
-          full_name: 'Nguyễn Văn A',
-          email: 'nguyenvana@example.com',
-          phone: '0987654321',
-          department: 'Phòng Nhân sự',
-          department_id: 1,
-          factory: 'Xí nghiệp 1',
-          factory_id: 1,
-          job_title: 'Trưởng phòng',
-          hire_date: '2020-01-01',
-          status: 'active',
-          avatar: null
-        },
-        {
-          id: 2,
-          employee_id: 'NV002',
-          first_name: 'Trần',
-          last_name: 'Thị B',
-          full_name: 'Trần Thị B',
-          email: 'tranthib@example.com',
-          phone: '0987654322',
-          department: 'Phòng Kế toán',
-          department_id: 2,
-          factory: 'Xí nghiệp 1',
-          factory_id: 1,
-          job_title: 'Nhân viên',
-          hire_date: '2020-02-01',
-          status: 'active',
-          avatar: null
-        },
-        {
-          id: 3,
-          employee_id: 'NV003',
-          first_name: 'Lê',
-          last_name: 'Văn C',
-          full_name: 'Lê Văn C',
-          email: 'levanc@example.com',
-          phone: '0987654323',
-          department: 'Phòng Kỹ thuật',
-          department_id: 3,
-          factory: 'Xí nghiệp 2',
-          factory_id: 2,
-          job_title: 'Kỹ sư',
-          hire_date: '2020-03-01',
-          status: 'active',
-          avatar: null
-        },
-        {
-          id: 4,
-          employee_id: 'NV004',
-          first_name: 'Phạm',
-          last_name: 'Thị D',
-          full_name: 'Phạm Thị D',
-          email: 'phamthid@example.com',
-          phone: '0987654324',
-          department: 'Phòng Kinh doanh',
-          department_id: 4,
-          factory: 'Xí nghiệp 2',
-          factory_id: 2,
-          job_title: 'Nhân viên',
-          hire_date: '2020-04-01',
-          status: 'probation',
-          avatar: null
-        },
-        {
-          id: 5,
-          employee_id: 'NV005',
-          first_name: 'Hoàng',
-          last_name: 'Văn E',
-          full_name: 'Hoàng Văn E',
-          email: 'hoangvane@example.com',
-          phone: '0987654325',
-          department: 'Phòng Nhân sự',
-          department_id: 1,
-          factory: 'Xí nghiệp 3',
-          factory_id: 3,
-          job_title: 'Nhân viên',
-          hire_date: '2020-05-01',
-          status: 'terminated',
-          avatar: null
-        }
-      ],
-      departments: [
-        { id: 1, name: 'Phòng Nhân sự' },
-        { id: 2, name: 'Phòng Kế toán' },
-        { id: 3, name: 'Phòng Kỹ thuật' },
-        { id: 4, name: 'Phòng Kinh doanh' }
-      ],
-      factories: [
-        { id: 1, name: 'Xí nghiệp 1' },
-        { id: 2, name: 'Xí nghiệp 2' },
-        { id: 3, name: 'Xí nghiệp 3' }
-      ]
+      employees: [],
+      departments: [],
+      factories: []
     }
   },
   computed: {
     ...mapGetters({
-      // employeesData: 'employees/allEmployees',
-      // isLoading: 'employees/isLoading'
+      employeesData: 'employees/allEmployees',
+      totalEmployees: 'employees/totalEmployees',
+      isLoading: 'employees/isLoading',
+      departmentsData: 'departments/allDepartments',
+      factoriesData: 'factories/allFactories'
     }),
     filteredEmployees() {
       let result = [...this.employees]
@@ -454,20 +362,37 @@ export default {
   },
   methods: {
     ...mapActions({
-      // fetchAllEmployees: 'employees/fetchEmployees',
-      // removeEmployee: 'employees/deleteEmployee'
+      fetchAllEmployees: 'employees/fetchEmployees',
+      removeEmployee: 'employees/deleteEmployee',
+      fetchAllDepartments: 'departments/fetchDepartments',
+      fetchAllFactories: 'factories/fetchFactories'
     }),
     async fetchEmployees() {
       this.loading = true
 
       try {
-        // Trong thực tế, bạn sẽ gọi API để lấy dữ liệu
-        // await this.fetchAllEmployees()
+        // Lấy danh sách nhân viên từ API
+        await this.fetchAllEmployees({
+          page: this.currentPage,
+          limit: this.perPage,
+          search: this.searchQuery,
+          department: this.departmentFilter,
+          factory: this.factoryFilter,
+          status: this.statusFilter
+        })
 
-        // Giả lập API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        // Lấy danh sách phòng ban và xí nghiệp
+        await Promise.all([
+          this.fetchAllDepartments(),
+          this.fetchAllFactories()
+        ])
+
+        // Cập nhật dữ liệu local từ store
+        this.employees = this.employeesData
+        this.departments = this.departmentsData
+        this.factories = this.factoriesData
       } catch (error) {
-        console.error('Error fetching employees:', error)
+        console.error('Error fetching data:', error)
       } finally {
         this.loading = false
       }
@@ -524,14 +449,11 @@ export default {
       this.loading = true
 
       try {
-        // Trong thực tế, bạn sẽ gọi API để xóa nhân viên
-        // await this.removeEmployee(this.employeeToDelete.id)
+        // Gọi API để xóa nhân viên
+        await this.removeEmployee(this.employeeToDelete.id)
 
-        // Giả lập API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        // Xóa nhân viên khỏi danh sách
-        this.employees = this.employees.filter(e => e.id !== this.employeeToDelete.id)
+        // Cập nhật lại danh sách nhân viên từ store
+        this.employees = this.employeesData
 
         // Hiển thị thông báo thành công
         this.$store.dispatch('setSuccess', `Đã xóa nhân viên ${this.employeeToDelete.full_name} thành công`)

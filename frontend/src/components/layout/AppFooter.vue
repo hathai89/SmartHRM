@@ -22,9 +22,12 @@ export default {
 
 <style lang="scss" scoped>
 .app-footer {
-  background: var(--primary-color, #003366);
+  background: var(--primary, #003366);
   color: rgba(255, 255, 255, 0.8);
   padding: 1rem 0;
+  margin-top: auto;
+  z-index: 900;
+  width: 100%;
 
   .footer-content {
     display: flex;

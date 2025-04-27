@@ -166,7 +166,7 @@ html, body {
 .badge {
   font-weight: $font-weight-normal;
   padding: 0.25em 0.5em;
-  border-radius: 50%;
+  border-radius: 4px;
 }
 
 // Notifications
@@ -184,7 +184,8 @@ html, body {
     align-items: center;
     justify-content: center;
     transform: translate(50%, -50%);
-    border: 2px solid $primary;
+    border: none;
+    border-radius: 4px;
     z-index: 2;
   }
 }

@@ -101,6 +101,7 @@
                     'bg-warning': employee.status === 'probation',
                     'bg-danger': employee.status === 'terminated'
                   }"
+                  style="border-radius: 4px; padding: 5px 8px;"
                 >
                   {{ getStatusText(employee.status) }}
                 </span>
