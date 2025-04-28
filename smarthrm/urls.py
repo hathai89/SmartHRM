@@ -4,6 +4,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView, TemplateView
+# Imports for views are now handled in their respective apps
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 urlpatterns = [
@@ -35,6 +36,12 @@ urlpatterns = [
 
     # API URLs
     path('api/', include('api.urls')),
+
+    # App URLs
+    path('', include('departments.urls')),
+    path('', include('factories.urls')),
+
+    # Direct API endpoints for tree structures are now defined in their respective apps
 
     # REST framework browsable API
     path('api-auth/', include('rest_framework.urls')),

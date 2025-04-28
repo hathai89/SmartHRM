@@ -36,4 +36,8 @@ router.register(r'dashboard', DashboardViewSet, basename='dashboard')
 urlpatterns = [
     path('', include(router.urls)),
     path('health-check/', HealthCheckView.as_view(), name='health-check'),
+
+    # Include departments and factories API endpoints
+    path('', include('departments.urls')),
+    path('', include('factories.urls')),
 ]

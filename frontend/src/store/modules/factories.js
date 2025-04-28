@@ -4,12 +4,14 @@ export default {
   namespaced: true,
   state: {
     factories: [],
+    factoryTree: [],
     factory: null,
     loading: false,
     error: null
   },
   getters: {
     allFactories: state => state.factories,
+    factoryTree: state => state.factoryTree,
     factoryById: state => id => state.factories.find(factory => factory.id === id),
     currentFactory: state => state.factory,
     isLoading: state => state.loading,
@@ -19,6 +21,9 @@ export default {
   mutations: {
     SET_FACTORIES(state, factories) {
       state.factories = factories
+    },
+    SET_FACTORY_TREE(state, tree) {
+      state.factoryTree = tree
     },
     SET_FACTORY(state, factory) {
       state.factory = factory
@@ -85,6 +90,34 @@ export default {
       }
     },
 
+    async fetchFactoryTree({ commit }) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+
+      try {
+        const response = await FactoryService.getFactoryTree()
+
+        let treeData = []
+        if (response.data) {
+          if (response.data.data && Array.isArray(response.data.data)) {
+            treeData = response.data.data
+          } else if (Array.isArray(response.data)) {
+            treeData = response.data
+          }
+        }
+
+        commit('SET_FACTORY_TREE', treeData)
+        return Promise.resolve(treeData)
+      } catch (error) {
+        console.error('Lỗi khi tải cấu trúc cây xí nghiệp:', error)
+        commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra khi tải cấu trúc cây xí nghiệp')
+        commit('SET_FACTORY_TREE', [])
+        return Promise.reject(error)
+      } finally {
+        commit('SET_LOADING', false)
+      }
+    },
+
     async fetchFactory({ commit }, id) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
@@ -143,6 +176,21 @@ export default {
         return Promise.resolve()
       } catch (error) {
         commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra khi xóa xí nghiệp')
+        return Promise.reject(error)
+      } finally {
+        commit('SET_LOADING', false)
+      }
+    },
+
+    async updateFactoryPosition({ commit }, { factoryId, parentId, position }) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+
+      try {
+        const response = await FactoryService.updateFactoryPosition(factoryId, parentId, position)
+        return Promise.resolve(response.data)
+      } catch (error) {
+        commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật vị trí xí nghiệp')
         return Promise.reject(error)
       } finally {
         commit('SET_LOADING', false)

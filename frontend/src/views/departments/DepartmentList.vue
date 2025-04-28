@@ -15,8 +15,24 @@
     </div>
 
     <div class="card mb-4">
+      <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs">
+          <li class="nav-item">
+            <a class="nav-link" :class="{ active: activeTab === 'list' }" href="#" @click.prevent="activeTab = 'list'">
+              <font-awesome-icon icon="list" class="me-2" />
+              Danh sách
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" :class="{ active: activeTab === 'tree' }" href="#" @click.prevent="activeTab = 'tree'">
+              <font-awesome-icon icon="sitemap" class="me-2" />
+              Cấu trúc cây
+            </a>
+          </li>
+        </ul>
+      </div>
       <div class="card-body">
-        <div class="row mb-3">
+        <div v-if="activeTab === 'list'" class="row mb-3">
           <div class="col-md-6 mb-2">
             <div class="input-group">
               <span class="input-group-text">
@@ -40,7 +56,8 @@
     </div>
 
     <template v-else>
-      <div class="row">
+      <!-- Hiển thị danh sách phòng ban -->
+      <div v-if="activeTab === 'list'" class="row">
         <div class="col-lg-4 mb-4" v-for="(department, index) in validFilteredDepartments" :key="department.id || index">
           <div class="card h-100 department-card">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -104,6 +121,14 @@
             Không tìm thấy phòng ban nào
           </div>
         </div>
+      </div>
+
+      <!-- Hiển thị cấu trúc cây phòng ban -->
+      <div v-else-if="activeTab === 'tree'">
+        <department-tree
+          :initial-expanded="true"
+          @department-saved="handleDepartmentSaved"
+        />
       </div>
     </template>
 
@@ -251,6 +276,7 @@ import { mapGetters, mapActions } from 'vuex'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import AlertMessage from '@/components/common/AlertMessage.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
+import DepartmentTree from '@/components/departments/DepartmentTree.vue'
 import { breadcrumbMixin } from '@/utils/breadcrumb'
 import debounce from 'lodash/debounce'
 import { Modal } from 'bootstrap'
@@ -260,7 +286,8 @@ export default {
   components: {
     LoadingSpinner,
     AlertMessage,
-    ConfirmDialog
+    ConfirmDialog,
+    DepartmentTree
   },
   mixins: [breadcrumbMixin],
   data() {
@@ -270,6 +297,7 @@ export default {
       error: null,
       searchQuery: '',
       isEdit: false,
+      activeTab: 'list', // Tab mặc định là danh sách
       formData: {
         code: '',
         name: '',
@@ -487,6 +515,15 @@ export default {
 
       const date = new Date(dateString)
       return date.toLocaleDateString('vi-VN')
+    },
+    handleDepartmentSaved(result) {
+      if (result.success) {
+        this.setSuccess(result.message)
+        // Cập nhật lại danh sách phòng ban
+        this.fetchDepartments()
+      } else {
+        this.setError(result.message)
+      }
     }
   }
 }

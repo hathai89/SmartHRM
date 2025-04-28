@@ -457,16 +457,16 @@ export default {
   z-index: 1000;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   padding: 0;
-  height: 50px;
+  height: 60px;
 
   @media (max-width: 991px) {
-    height: 50px;
-    min-height: 50px;
+    height: 60px;
+    min-height: 60px;
   }
 
   @media (max-width: 767px) {
-    height: 50px;
-    min-height: 50px;
+    height: 60px;
+    min-height: 60px;
   }
 
   .container-fluid {
@@ -481,7 +481,7 @@ export default {
     padding: 0 0.5rem;
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
+    overflow: visible;
 
     @media (max-width: 991px) {
       flex-wrap: wrap;
@@ -495,10 +495,10 @@ export default {
   .main-nav {
     flex: 1;
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     position: relative;
-    margin: 0 10px;
-    overflow-x: auto;
+    margin: 0 5px;
+    overflow-x: visible;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 
@@ -530,7 +530,7 @@ export default {
       z-index: 1010;
       position: absolute;
       right: 10px;
-      top: 10px;
+      top: 15px;
 
       &:hover {
         background-color: rgba(255, 255, 255, 0.1);
@@ -554,10 +554,11 @@ export default {
       margin: 0;
       padding: 0;
       background-color: transparent;
+      flex-wrap: nowrap;
 
       @media (max-width: 991px) {
         position: fixed;
-        top: 50px;
+        top: 60px;
         left: 0;
         right: 0;
         flex-direction: column;
@@ -566,7 +567,7 @@ export default {
         display: none;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         z-index: 1020;
-        max-height: calc(100vh - 50px);
+        max-height: calc(100vh - 60px);
         overflow-y: auto;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
         opacity: 0;
@@ -586,13 +587,13 @@ export default {
         .nav-link {
           display: flex;
           align-items: center;
-          padding: 0 0.5rem;
-          height: 50px;
+          padding: 0 0.3rem;
+          height: 60px;
           color: white;
           font-weight: 500;
           transition: all 0.3s ease;
           white-space: nowrap;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
 
           @media (max-width: 991px) {
             height: auto;
@@ -613,26 +614,26 @@ export default {
           }
 
           svg {
-            margin-right: 0.3rem;
-            width: 16px;
+            margin-right: 0.2rem;
+            width: 14px;
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
           }
 
           span {
-            margin-right: 0.3rem;
+            margin-right: 0.2rem;
           }
 
           .dropdown-icon {
-            margin-left: 0.25rem;
-            font-size: 0.75rem;
+            margin-left: 0.15rem;
+            font-size: 0.7rem;
             transition: transform 0.2s ease;
           }
         }
 
         &.dropdown {
           .nav-link {
-            padding-right: 0.8rem;
+            padding-right: 0.5rem;
           }
 
           &.active .dropdown-icon {
@@ -644,12 +645,14 @@ export default {
           position: absolute;
           top: 100%;
           left: 0;
-          min-width: 220px;
+          min-width: 200px;
           background: white;
           border-radius: 4px;
           box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
           display: none;
           z-index: 1000;
+          max-height: calc(100vh - 60px);
+          overflow-y: auto;
 
           @media (max-width: 991px) {
             position: static;
@@ -668,7 +671,7 @@ export default {
           .dropdown-item {
             display: flex;
             align-items: center;
-            padding: 0.75rem 1rem;
+            padding: 0.6rem 0.8rem;
             color: #343a40;
             transition: all 0.3s ease;
 
@@ -689,8 +692,8 @@ export default {
             }
 
             svg {
-              margin-right: 0.75rem;
-              width: 20px;
+              margin-right: 0.5rem;
+              width: 16px;
               text-align: center;
               color: #6c757d;
 
@@ -709,6 +712,7 @@ export default {
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    margin-right: 5px;
 
     @media (max-width: 991px) {
       max-width: 60%;
@@ -722,8 +726,8 @@ export default {
       font-weight: 600;
 
       .brand-logo {
-        height: 36px;
-        margin-right: 0.5rem;
+        height: 32px;
+        margin-right: 0.3rem;
         border-radius: 4px;
 
         @media (max-width: 576px) {
@@ -755,28 +759,28 @@ export default {
   .header-right {
     display: flex;
     align-items: center;
-    margin-left: 0.5rem;
+    margin-left: 0.3rem;
     flex-shrink: 0;
 
     @media (max-width: 991px) {
       position: absolute;
       right: 60px;
-      top: 10px;
+      top: 15px;
     }
 
     .dropdown {
       position: relative;
-      margin-left: 0.75rem;
+      margin-left: 0.4rem;
 
       .btn-icon {
         background: transparent;
         border: none;
         color: white;
-        font-size: 1.25rem;
-        padding: 0.5rem;
+        font-size: 1.1rem;
+        padding: 0.4rem;
         border-radius: 4px;
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -798,13 +802,13 @@ export default {
           background-color: #ff7f50;
           color: white;
           border-radius: 4px;
-          min-width: 18px;
-          height: 18px;
-          font-size: 0.7rem;
+          min-width: 16px;
+          height: 16px;
+          font-size: 0.65rem;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 0 4px;
+          padding: 0 3px;
           border: none;
           transform: translate(25%, -25%);
         }
@@ -813,11 +817,11 @@ export default {
       .user-btn {
         display: flex;
         align-items: center;
-        padding: 0.5rem;
+        padding: 0.4rem;
         border-radius: 4px;
         background-color: transparent;
         width: auto;
-        height: 40px;
+        height: 36px;
 
         @media (max-width: 991px) {
           padding: 0.25rem;
@@ -832,23 +836,23 @@ export default {
         }
 
         .user-avatar {
-          width: 32px;
-          height: 32px;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
           object-fit: cover;
           border: 2px solid rgba(255, 255, 255, 0.5);
         }
 
         .user-icon {
-          font-size: 1.75rem;
+          font-size: 1.5rem;
           color: white;
           filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.5));
         }
 
         .username {
-          margin-left: 0.5rem;
+          margin-left: 0.3rem;
           font-weight: 500;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
         }
       }
 
@@ -856,8 +860,8 @@ export default {
         position: absolute;
         top: 100%;
         right: 0;
-        margin-top: 0.5rem;
-        min-width: 240px;
+        margin-top: 0.4rem;
+        min-width: 220px;
         background: white;
         border-radius: 4px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);

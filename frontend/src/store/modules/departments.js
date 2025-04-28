@@ -4,12 +4,14 @@ export default {
   namespaced: true,
   state: {
     departments: [],
+    departmentTree: [],
     department: null,
     loading: false,
     error: null
   },
   getters: {
     allDepartments: state => state.departments,
+    departmentTree: state => state.departmentTree,
     departmentById: state => id => state.departments.find(dept => dept.id === id),
     currentDepartment: state => state.department,
     isLoading: state => state.loading,
@@ -19,6 +21,9 @@ export default {
   mutations: {
     SET_DEPARTMENTS(state, departments) {
       state.departments = departments
+    },
+    SET_DEPARTMENT_TREE(state, tree) {
+      state.departmentTree = tree
     },
     SET_DEPARTMENT(state, department) {
       state.department = department
@@ -85,6 +90,34 @@ export default {
       }
     },
 
+    async fetchDepartmentTree({ commit }) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+
+      try {
+        const response = await DepartmentService.getDepartmentTree()
+
+        let treeData = []
+        if (response.data) {
+          if (response.data.data && Array.isArray(response.data.data)) {
+            treeData = response.data.data
+          } else if (Array.isArray(response.data)) {
+            treeData = response.data
+          }
+        }
+
+        commit('SET_DEPARTMENT_TREE', treeData)
+        return Promise.resolve(treeData)
+      } catch (error) {
+        console.error('Lỗi khi tải cấu trúc cây phòng ban:', error)
+        commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra khi tải cấu trúc cây phòng ban')
+        commit('SET_DEPARTMENT_TREE', [])
+        return Promise.reject(error)
+      } finally {
+        commit('SET_LOADING', false)
+      }
+    },
+
     async fetchDepartment({ commit }, id) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
@@ -143,6 +176,21 @@ export default {
         return Promise.resolve()
       } catch (error) {
         commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra khi xóa phòng ban')
+        return Promise.reject(error)
+      } finally {
+        commit('SET_LOADING', false)
+      }
+    },
+
+    async updateDepartmentPosition({ commit }, { departmentId, parentId, position }) {
+      commit('SET_LOADING', true)
+      commit('CLEAR_ERROR')
+
+      try {
+        const response = await DepartmentService.updateDepartmentPosition(departmentId, parentId, position)
+        return Promise.resolve(response.data)
+      } catch (error) {
+        commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật vị trí phòng ban')
         return Promise.reject(error)
       } finally {
         commit('SET_LOADING', false)
