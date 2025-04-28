@@ -44,7 +44,11 @@ class DepartmentViewSet(viewsets.ModelViewSet):
         from .serializers import DepartmentTreeSerializer
         serializer = DepartmentTreeSerializer(root_departments, many=True)
 
-        return Response(serializer.data)
+        # Trả về dữ liệu theo định dạng tương thích với frontend
+        return Response({
+            'success': True,
+            'data': serializer.data
+        })
 
     @action(detail=True, methods=['get'])
     def children(self, request, pk=None):
@@ -220,12 +224,32 @@ def get_department_tree_json(request):
             result = []
             for dept in departments:
                 children = dept.get_children()
+                # Lấy danh sách nhân viên thuộc phòng ban
+                employees = dept.employees.all().values('id', 'code', 'full_name', 'avatar', 'job_title__name', 'status', 'join_date')
+
+                # Chuyển đổi các trường để phù hợp với frontend
+                employees_list = []
+                for emp in employees:
+                    employee_dict = {
+                        'id': emp['id'],
+                        'code': emp['code'],
+                        'full_name': emp['full_name'],
+                        'avatar': emp['avatar'],
+                        'job_title_name': emp['job_title__name'],
+                        'department_name': dept.name,
+                        'status': emp['status'],
+                        'join_date': emp['join_date']
+                    }
+                    employees_list.append(employee_dict)
+
                 dept_dict = {
                     'id': dept.id,
                     'name': dept.name,
                     'code': dept.code,
-                    'type': dept.dept_type,
-                    'children': build_tree(children) if children else []
+                    'dept_type': dept.dept_type,
+                    'type': dept.dept_type,  # Giữ lại để tương thích
+                    'children': build_tree(children) if children else [],
+                    'employees': employees_list
                 }
                 result.append(dept_dict)
             return result

@@ -1,13 +1,12 @@
 <template>
   <div class="factory-list">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1 class="h3">Danh sách xí nghiệp</h1>
+    <div class="d-flex justify-content-end align-items-center mb-4">
       <div class="d-flex">
-        <button class="btn btn-outline-secondary me-2" @click="refreshData">
+        <button class="btn-flat btn-flat-secondary me-2" @click="refreshData">
           <font-awesome-icon icon="sync" :class="{ 'fa-spin': loading }" />
           Làm mới
         </button>
-        <button class="btn btn-primary" @click="openCreateModal">
+        <button class="btn-flat btn-flat-primary" @click="openCreateModal">
           <font-awesome-icon icon="plus" class="me-2" />
           Thêm xí nghiệp
         </button>
@@ -18,13 +17,7 @@
       <div class="card-header">
         <ul class="nav nav-tabs card-header-tabs">
           <li class="nav-item">
-            <a class="nav-link" :class="{ active: activeTab === 'list' }" href="#" @click.prevent="activeTab = 'list'">
-              <font-awesome-icon icon="list" class="me-2" />
-              Danh sách
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" :class="{ active: activeTab === 'tree' }" href="#" @click.prevent="activeTab = 'tree'">
+            <a class="nav-link active" href="#">
               <font-awesome-icon icon="sitemap" class="me-2" />
               Cấu trúc cây
             </a>
@@ -32,7 +25,7 @@
         </ul>
       </div>
       <div class="card-body">
-        <div v-if="activeTab === 'list'" class="row mb-3">
+        <div class="row mb-3">
           <div class="col-md-6 mb-2">
             <div class="input-group">
               <span class="input-group-text">
@@ -43,7 +36,6 @@
                 class="form-control"
                 v-model="searchQuery"
                 placeholder="Tìm kiếm xí nghiệp..."
-                @input="handleSearch"
               >
             </div>
           </div>
@@ -56,79 +48,8 @@
     </div>
 
     <template v-else>
-      <!-- Hiển thị danh sách xí nghiệp -->
-      <div v-if="activeTab === 'list'" class="row">
-        <div class="col-lg-4 mb-4" v-for="(factory, index) in validFilteredFactories" :key="factory.id || index">
-          <div class="card h-100 factory-card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <h5 class="mb-0">{{ factory.name }}</h5>
-              <div class="dropdown">
-                <button class="btn btn-sm btn-outline-secondary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                  <font-awesome-icon icon="ellipsis-v" />
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                  <li>
-                    <a class="dropdown-item" href="#" @click.prevent="openEditModal(factory)">
-                      <font-awesome-icon icon="edit" class="me-2" />
-                      Chỉnh sửa
-                    </a>
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="#" @click.prevent="openViewModal(factory)">
-                      <font-awesome-icon icon="eye" class="me-2" />
-                      Xem chi tiết
-                    </a>
-                  </li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li>
-                    <a class="dropdown-item text-danger" href="#" @click.prevent="confirmDelete(factory)">
-                      <font-awesome-icon icon="trash-alt" class="me-2" />
-                      Xóa
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="mb-3">
-                <div class="text-muted small mb-1">Mã xí nghiệp</div>
-                <div>{{ factory.code }}</div>
-              </div>
-              <div class="mb-3">
-                <div class="text-muted small mb-1">Quản đốc</div>
-                <div>{{ factory.manager || 'Chưa có' }}</div>
-              </div>
-              <div class="mb-3">
-                <div class="text-muted small mb-1">Địa chỉ</div>
-                <div class="address-text">{{ factory.address || 'Chưa cập nhật' }}</div>
-              </div>
-              <div class="mb-3">
-                <div class="text-muted small mb-1">Số nhân viên</div>
-                <div>{{ factory.employee_count || 0 }}</div>
-              </div>
-              <div>
-                <div class="text-muted small mb-1">Mô tả</div>
-                <div class="description-text">{{ factory.description || 'Không có mô tả' }}</div>
-              </div>
-            </div>
-            <div class="card-footer">
-              <button class="btn btn-sm btn-outline-primary w-100" @click="viewEmployees(factory)">
-                <font-awesome-icon icon="users" class="me-2" />
-                Xem danh sách nhân viên
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12" v-if="filteredFactories.length === 0">
-          <div class="alert alert-info text-center">
-            Không tìm thấy xí nghiệp nào
-          </div>
-        </div>
-      </div>
-
       <!-- Hiển thị cấu trúc cây xí nghiệp -->
-      <div v-else-if="activeTab === 'tree'">
+      <div>
         <factory-tree
           :initial-expanded="true"
           @factory-saved="handleFactorySaved"
@@ -295,7 +216,7 @@ import AlertMessage from '@/components/common/AlertMessage.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import FactoryTree from '@/components/factories/FactoryTree.vue'
 import { breadcrumbMixin } from '@/utils/breadcrumb'
-import debounce from 'lodash/debounce'
+
 import { Modal } from 'bootstrap'
 
 export default {
@@ -314,7 +235,6 @@ export default {
       error: null,
       searchQuery: '',
       isEdit: false,
-      activeTab: 'list', // Tab mặc định là danh sách
       formData: {
         code: '',
         name: '',
@@ -417,9 +337,7 @@ export default {
     refreshData() {
       this.fetchFactories()
     },
-    handleSearch: debounce(function() {
-      // Không cần làm gì vì chúng ta đã sử dụng computed property
-    }, 300),
+
     openCreateModal() {
       this.isEdit = false
       this.formData = {

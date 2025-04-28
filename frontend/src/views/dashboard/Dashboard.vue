@@ -221,11 +221,25 @@ export default {
         ]);
 
         // Cập nhật thống kê với xử lý an toàn
+        // Đếm số nhân viên
+        const totalEmployees = employeesResponse.data?.count || (employeesResponse.data?.results || []).length || 0;
+
+        // Đếm số phòng ban (chỉ đếm các phòng ban cấp cao nhất, không đếm bộ phận và nhóm)
+        const departments = departmentsResponse.data?.results || [];
+        const totalDepartments = departments.filter(dept => dept.dept_type === 'department').length;
+
+        // Đếm số xí nghiệp (chỉ đếm các xí nghiệp cấp cao nhất, không đếm bộ phận và nhóm)
+        const factories = factoriesResponse.data?.results || [];
+        const totalFactories = factories.filter(factory => factory.factory_type === 'factory').length;
+
+        // Đếm số tài liệu
+        const totalDocuments = documentsResponse.data?.count || (documentsResponse.data?.results || []).length || 0;
+
         this.stats = {
-          totalEmployees: employeesResponse.data?.count || (employeesResponse.data?.results || []).length || 0,
-          totalDepartments: departmentsResponse.data?.count || (departmentsResponse.data?.results || []).length || 0,
-          totalFactories: factoriesResponse.data?.count || (factoriesResponse.data?.results || []).length || 0,
-          totalDocuments: documentsResponse.data?.count || (documentsResponse.data?.results || []).length || 0
+          totalEmployees,
+          totalDepartments,
+          totalFactories,
+          totalDocuments
         }
 
         // Cập nhật hoạt động gần đây với xử lý an toàn

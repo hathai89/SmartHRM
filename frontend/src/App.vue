@@ -171,6 +171,72 @@ export default {
   border-radius: 4px !important;
 }
 
+// Flat design badges
+.stat-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 500;
+  color: white;
+  box-shadow: none;
+  border: none;
+}
+
+.stat-badge-primary {
+  background-color: $primary;
+  color: white;
+}
+
+.stat-badge-info {
+  background-color: $info;
+  color: white;
+}
+
+.stat-badge-secondary {
+  background-color: $secondary;
+  color: white;
+}
+
+// Flat buttons
+.btn-flat {
+  border-radius: 4px;
+  box-shadow: none;
+  border: none;
+  padding: 8px 16px;
+  font-weight: 500;
+  transition: background-color 0.2s, transform 0.1s;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+.btn-flat-primary {
+  background-color: $primary;
+  color: white;
+
+  &:hover {
+    background-color: darken($primary, 5%);
+    color: white;
+  }
+}
+
+.btn-flat-secondary {
+  background-color: #f0f0f0;
+  color: $dark;
+
+  &:hover {
+    background-color: darken(#f0f0f0, 5%);
+    color: $dark;
+  }
+}
+
 body {
   font-family: $font-family-sans-serif;
   font-size: $font-size-base;

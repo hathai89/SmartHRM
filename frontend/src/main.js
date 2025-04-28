@@ -32,7 +32,9 @@ import {
   // Thêm biểu tượng cho menu mới
   faUserTie, faFileSignature, faCalendarCheck, faLaptop, faTags,
   // Thêm các biểu tượng còn thiếu
-  faTree, faNetworkWired, faProjectDiagram, faSitemap, faThList, faColumns
+  faTree, faNetworkWired, faProjectDiagram, faSitemap, faThList, faColumns,
+  // Thêm biểu tượng cho cấu trúc cây phòng ban và xí nghiệp
+  faLayerGroup, faExpand, faCompress, faCogs
 } from '@fortawesome/free-solid-svg-icons'
 
 // Import i18n
@@ -57,7 +59,9 @@ library.add(
   // Thêm biểu tượng cho menu mới
   faUserTie, faFileSignature, faCalendarCheck, faLaptop, faTags,
   // Thêm các biểu tượng còn thiếu
-  faTree, faNetworkWired, faProjectDiagram, faSitemap, faThList, faColumns
+  faTree, faNetworkWired, faProjectDiagram, faSitemap, faThList, faColumns,
+  // Thêm biểu tượng cho cấu trúc cây phòng ban
+  faLayerGroup, faExpand, faCompress, faCogs
 )
 
 // i18n đã được cấu hình trong file i18n.js

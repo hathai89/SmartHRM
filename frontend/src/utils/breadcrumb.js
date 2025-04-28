@@ -8,79 +8,79 @@ export const routeBreadcrumbs = {
     { title: 'Bảng điều khiển', route: { name: 'dashboard' } }
   ],
   'employees': [
-    { title: 'Nhân viên', route: { name: 'employees' } }
+    { title: 'Danh sách nhân viên', route: { name: 'employees' } }
   ],
   'employee-detail': [
-    { title: 'Nhân viên', route: { name: 'employees' } },
+    { title: 'Danh sách nhân viên', route: { name: 'employees' } },
     { title: 'Chi tiết nhân viên', route: null }
   ],
   'employee-create': [
-    { title: 'Nhân viên', route: { name: 'employees' } },
+    { title: 'Danh sách nhân viên', route: { name: 'employees' } },
     { title: 'Thêm nhân viên', route: null }
   ],
   'employee-edit': [
-    { title: 'Nhân viên', route: { name: 'employees' } },
+    { title: 'Danh sách nhân viên', route: { name: 'employees' } },
     { title: 'Chỉnh sửa nhân viên', route: null }
   ],
   'departments': [
-    { title: 'Phòng ban', route: { name: 'departments' } }
+    { title: 'Danh sách phòng ban', route: { name: 'departments' } }
   ],
   'department-detail': [
-    { title: 'Phòng ban', route: { name: 'departments' } },
+    { title: 'Danh sách phòng ban', route: { name: 'departments' } },
     { title: 'Chi tiết phòng ban', route: null }
   ],
   'department-create': [
-    { title: 'Phòng ban', route: { name: 'departments' } },
+    { title: 'Danh sách phòng ban', route: { name: 'departments' } },
     { title: 'Thêm phòng ban', route: null }
   ],
   'department-edit': [
-    { title: 'Phòng ban', route: { name: 'departments' } },
+    { title: 'Danh sách phòng ban', route: { name: 'departments' } },
     { title: 'Chỉnh sửa phòng ban', route: null }
   ],
   'factories': [
-    { title: 'Xí nghiệp', route: { name: 'factories' } }
+    { title: 'Danh sách xí nghiệp', route: { name: 'factories' } }
   ],
   'factory-detail': [
-    { title: 'Xí nghiệp', route: { name: 'factories' } },
+    { title: 'Danh sách xí nghiệp', route: { name: 'factories' } },
     { title: 'Chi tiết xí nghiệp', route: null }
   ],
   'factory-create': [
-    { title: 'Xí nghiệp', route: { name: 'factories' } },
+    { title: 'Danh sách xí nghiệp', route: { name: 'factories' } },
     { title: 'Thêm xí nghiệp', route: null }
   ],
   'factory-edit': [
-    { title: 'Xí nghiệp', route: { name: 'factories' } },
+    { title: 'Danh sách xí nghiệp', route: { name: 'factories' } },
     { title: 'Chỉnh sửa xí nghiệp', route: null }
   ],
   'documents': [
-    { title: 'Tài liệu', route: { name: 'documents' } }
+    { title: 'Danh sách tài liệu', route: { name: 'documents' } }
   ],
   'document-detail': [
-    { title: 'Tài liệu', route: { name: 'documents' } },
+    { title: 'Danh sách tài liệu', route: { name: 'documents' } },
     { title: 'Chi tiết tài liệu', route: null }
   ],
   'document-create': [
-    { title: 'Tài liệu', route: { name: 'documents' } },
+    { title: 'Danh sách tài liệu', route: { name: 'documents' } },
     { title: 'Thêm tài liệu', route: null }
   ],
   'document-edit': [
-    { title: 'Tài liệu', route: { name: 'documents' } },
+    { title: 'Danh sách tài liệu', route: { name: 'documents' } },
     { title: 'Chỉnh sửa tài liệu', route: null }
   ],
   'company': [
-    { title: 'Công ty', route: { name: 'company' } }
+    { title: 'Thông tin công ty', route: { name: 'company' } }
   ],
   'profile': [
-    { title: 'Hồ sơ', route: { name: 'profile' } }
+    { title: 'Hồ sơ cá nhân', route: { name: 'profile' } }
   ],
   'settings': [
-    { title: 'Cài đặt', route: { name: 'settings' } }
+    { title: 'Cài đặt hệ thống', route: { name: 'settings' } }
   ],
   'notifications': [
-    { title: 'Thông báo', route: { name: 'notifications' } }
+    { title: 'Thông báo hệ thống', route: { name: 'notifications' } }
   ],
   'change-password': [
-    { title: 'Hồ sơ', route: { name: 'profile' } },
+    { title: 'Hồ sơ cá nhân', route: { name: 'profile' } },
     { title: 'Đổi mật khẩu', route: null }
   ]
 };

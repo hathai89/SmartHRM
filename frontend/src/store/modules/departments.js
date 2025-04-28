@@ -96,6 +96,7 @@ export default {
 
       try {
         const response = await DepartmentService.getDepartmentTree()
+        console.log('API response:', response)
 
         let treeData = []
         if (response.data) {
@@ -106,6 +107,7 @@ export default {
           }
         }
 
+        console.log('Tree data to commit:', treeData)
         commit('SET_DEPARTMENT_TREE', treeData)
         return Promise.resolve(treeData)
       } catch (error) {

@@ -2,7 +2,23 @@
   <div class="department-tree">
     <div class="card">
       <div class="card-header">
-        <h5 class="card-title mb-0">Cấu trúc phòng ban</h5>
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">Cấu trúc phòng ban</h5>
+          <div v-if="!loading && treeData.length > 0" class="d-flex align-items-center">
+            <div class="stat-badge stat-badge-primary me-2">
+              <font-awesome-icon icon="building" class="me-1" />
+              {{ departmentStats.departments }} phòng ban
+            </div>
+            <div class="stat-badge stat-badge-info me-2">
+              <font-awesome-icon icon="layer-group" class="me-1" />
+              {{ departmentStats.divisions }} bộ phận
+            </div>
+            <div class="stat-badge stat-badge-secondary">
+              <font-awesome-icon icon="users" class="me-1" />
+              {{ departmentStats.teams }} nhóm
+            </div>
+          </div>
+        </div>
       </div>
       <div class="card-body">
         <div v-if="loading" class="text-center py-3">
@@ -19,16 +35,16 @@
         <div v-else>
           <!-- Thanh công cụ -->
           <div class="mb-3 d-flex justify-content-between">
-            <div class="btn-group">
-              <button class="btn btn-sm btn-outline-secondary" @click="expandAll">
+            <div class="d-flex">
+              <button class="btn-flat btn-flat-secondary me-2" style="padding: 4px 10px; font-size: 0.875rem;" @click="expandAll">
                 <font-awesome-icon icon="expand" class="me-1" /> Mở rộng tất cả
               </button>
-              <button class="btn btn-sm btn-outline-secondary" @click="collapseAll">
+              <button class="btn-flat btn-flat-secondary" style="padding: 4px 10px; font-size: 0.875rem;" @click="collapseAll">
                 <font-awesome-icon icon="compress" class="me-1" /> Thu gọn tất cả
               </button>
             </div>
             <div class="input-group" style="width: 250px">
-              <span class="input-group-text">
+              <span class="input-group-text" style="border-radius: 4px 0 0 4px; border: none; background-color: #f0f0f0;">
                 <font-awesome-icon icon="search" />
               </span>
               <input
@@ -36,6 +52,7 @@
                 class="form-control form-control-sm"
                 v-model="searchQuery"
                 placeholder="Tìm kiếm phòng ban..."
+                style="border-radius: 0 4px 4px 0; border: none; background-color: #f0f0f0;"
               >
             </div>
           </div>
@@ -48,6 +65,7 @@
                 :key="department.id"
                 :department="department"
                 :search-query="searchQuery"
+                :expanded-nodes="expandedNodes"
                 @node-click="handleNodeClick"
                 @edit-node="handleEditNode"
                 @add-child="handleAddChild"
@@ -111,9 +129,9 @@
                 <label for="departmentParent" class="form-label">Đơn vị cha</label>
                 <select class="form-select" id="departmentParent" v-model="formData.parent">
                   <option :value="null">-- Không có --</option>
-                  <option 
-                    v-for="dept in availableParents" 
-                    :key="dept.id" 
+                  <option
+                    v-for="dept in availableParents"
+                    :key="dept.id"
                     :value="dept.id"
                   >
                     {{ dept.name }} ({{ dept.code }})
@@ -175,7 +193,7 @@ export default {
   props: {
     initialExpanded: {
       type: Boolean,
-      default: false
+      default: true
     }
   },
   data() {
@@ -203,6 +221,36 @@ export default {
     }
   },
   computed: {
+    departmentStats() {
+      // Hàm đệ quy để đếm số lượng phòng ban, bộ phận, nhóm
+      const countDepartmentTypes = (nodes) => {
+        if (!nodes || !Array.isArray(nodes)) return { departments: 0, divisions: 0, teams: 0 }
+
+        let stats = { departments: 0, divisions: 0, teams: 0 }
+
+        nodes.forEach(node => {
+          if (node.dept_type === 'department') {
+            stats.departments++
+          } else if (node.dept_type === 'division') {
+            stats.divisions++
+          } else if (node.dept_type === 'team') {
+            stats.teams++
+          }
+
+          // Đệ quy đếm các node con
+          if (node.children && node.children.length > 0) {
+            const childStats = countDepartmentTypes(node.children)
+            stats.departments += childStats.departments
+            stats.divisions += childStats.divisions
+            stats.teams += childStats.teams
+          }
+        })
+
+        return stats
+      }
+
+      return countDepartmentTypes(this.treeData)
+    },
     filteredTreeData() {
       if (!this.searchQuery) {
         return this.treeData
@@ -214,13 +262,13 @@ export default {
 
         return nodes.filter(node => {
           // Kiểm tra nếu node hiện tại khớp với từ khóa tìm kiếm
-          const nodeMatches = 
+          const nodeMatches =
             node.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
             node.code.toLowerCase().includes(this.searchQuery.toLowerCase())
 
           // Lọc các node con
           const filteredChildren = filterTree(node.children)
-          
+
           // Nếu có node con khớp, giữ lại node cha
           if (filteredChildren.length > 0) {
             node.children = filteredChildren
@@ -247,7 +295,7 @@ export default {
       }
 
       const allDepartments = flattenDepartments(this.treeData)
-      
+
       // Lọc theo ràng buộc
       if (this.formData.dept_type === 'division') {
         // Bộ phận chỉ có thể thuộc phòng ban
@@ -256,7 +304,7 @@ export default {
         // Nhóm chỉ có thể thuộc bộ phận
         return allDepartments.filter(dept => dept.dept_type === 'division')
       }
-      
+
       // Phòng ban không có parent
       return []
     }
@@ -274,7 +322,9 @@ export default {
     }),
     initModal() {
       this.$nextTick(() => {
-        this.departmentModal = new Modal(this.$refs.departmentModal)
+        if (this.$refs.departmentModal) {
+          this.departmentModal = new Modal(this.$refs.departmentModal)
+        }
       })
     },
     async fetchDepartmentTree() {
@@ -284,6 +334,8 @@ export default {
       try {
         const response = await this.fetchDepartmentTreeData()
         this.treeData = response
+
+        console.log('Fetched department tree:', this.treeData)
 
         // Mở rộng tất cả các node nếu initialExpanded = true
         if (this.initialExpanded) {
@@ -299,7 +351,7 @@ export default {
     expandAll() {
       const expandNodes = (nodes) => {
         if (!nodes) return
-        
+
         nodes.forEach(node => {
           this.expandedNodes.add(node.id)
           if (node.children && node.children.length > 0) {
@@ -307,7 +359,7 @@ export default {
           }
         })
       }
-      
+
       expandNodes(this.treeData)
     },
     collapseAll() {
@@ -337,7 +389,7 @@ export default {
     handleAddChild(parentDepartment) {
       this.isEdit = false
       this.selectedParentId = parentDepartment ? parentDepartment.id : null
-      
+
       // Xác định loại phòng ban con dựa trên loại phòng ban cha
       let childType = 'department'
       if (parentDepartment) {
@@ -347,7 +399,7 @@ export default {
           childType = 'team'
         }
       }
-      
+
       this.formData = {
         id: null,
         code: this.generateDepartmentCode(),
@@ -356,7 +408,7 @@ export default {
         parent: parentDepartment ? parentDepartment.id : null,
         description: ''
       }
-      
+
       this.formError = null
       this.departmentModal.show()
     },
@@ -376,19 +428,19 @@ export default {
 
       try {
         const departmentData = { ...this.formData }
-        
+
         if (this.isEdit) {
           await this.updateDepartment({ id: departmentData.id, data: departmentData })
         } else {
           await this.createDepartment(departmentData)
         }
-        
+
         // Cập nhật lại cây phòng ban
         await this.fetchDepartmentTree()
-        
+
         // Đóng modal
         this.departmentModal.hide()
-        
+
         // Hiển thị thông báo thành công
         this.$emit('department-saved', {
           success: true,
@@ -405,15 +457,15 @@ export default {
     },
     async confirmDelete() {
       if (!this.departmentToDelete) return
-      
+
       this.loading = true
-      
+
       try {
         await this.deleteDepartment(this.departmentToDelete.id)
-        
+
         // Cập nhật lại cây phòng ban
         await this.fetchDepartmentTree()
-        
+
         // Hiển thị thông báo thành công
         this.$emit('department-saved', {
           success: true,
@@ -445,7 +497,7 @@ export default {
     max-height: 600px;
     overflow-y: auto;
   }
-  
+
   .tree-root {
     list-style: none;
     padding-left: 0;

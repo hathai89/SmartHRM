@@ -2,7 +2,23 @@
   <div class="factory-tree">
     <div class="card">
       <div class="card-header">
-        <h5 class="card-title mb-0">Cấu trúc xí nghiệp</h5>
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">Cấu trúc xí nghiệp</h5>
+          <div v-if="!loading && treeData.length > 0" class="d-flex align-items-center">
+            <div class="stat-badge stat-badge-primary me-2">
+              <font-awesome-icon icon="industry" class="me-1" />
+              {{ factoryStats.factories }} xí nghiệp
+            </div>
+            <div class="stat-badge stat-badge-info me-2">
+              <font-awesome-icon icon="layer-group" class="me-1" />
+              {{ factoryStats.divisions }} bộ phận
+            </div>
+            <div class="stat-badge stat-badge-secondary">
+              <font-awesome-icon icon="users" class="me-1" />
+              {{ factoryStats.teams }} nhóm
+            </div>
+          </div>
+        </div>
       </div>
       <div class="card-body">
         <div v-if="loading" class="text-center py-3">
@@ -19,16 +35,16 @@
         <div v-else>
           <!-- Thanh công cụ -->
           <div class="mb-3 d-flex justify-content-between">
-            <div class="btn-group">
-              <button class="btn btn-sm btn-outline-secondary" @click="expandAll">
+            <div class="d-flex">
+              <button class="btn-flat btn-flat-secondary me-2" style="padding: 4px 10px; font-size: 0.875rem;" @click="expandAll">
                 <font-awesome-icon icon="expand" class="me-1" /> Mở rộng tất cả
               </button>
-              <button class="btn btn-sm btn-outline-secondary" @click="collapseAll">
+              <button class="btn-flat btn-flat-secondary" style="padding: 4px 10px; font-size: 0.875rem;" @click="collapseAll">
                 <font-awesome-icon icon="compress" class="me-1" /> Thu gọn tất cả
               </button>
             </div>
             <div class="input-group" style="width: 250px">
-              <span class="input-group-text">
+              <span class="input-group-text" style="border-radius: 4px 0 0 4px; border: none; background-color: #f0f0f0;">
                 <font-awesome-icon icon="search" />
               </span>
               <input
@@ -36,6 +52,7 @@
                 class="form-control form-control-sm"
                 v-model="searchQuery"
                 placeholder="Tìm kiếm xí nghiệp..."
+                style="border-radius: 0 4px 4px 0; border: none; background-color: #f0f0f0;"
               >
             </div>
           </div>
@@ -112,9 +129,9 @@
                 <label for="factoryParent" class="form-label">Đơn vị cha</label>
                 <select class="form-select" id="factoryParent" v-model="formData.parent">
                   <option :value="null">-- Không có --</option>
-                  <option 
-                    v-for="factory in availableParents" 
-                    :key="factory.id" 
+                  <option
+                    v-for="factory in availableParents"
+                    :key="factory.id"
                     :value="factory.id"
                   >
                     {{ factory.name }} ({{ factory.code }})
@@ -194,7 +211,7 @@ export default {
   props: {
     initialExpanded: {
       type: Boolean,
-      default: false
+      default: true
     }
   },
   data() {
@@ -224,6 +241,36 @@ export default {
     }
   },
   computed: {
+    factoryStats() {
+      // Hàm đệ quy để đếm số lượng xí nghiệp, bộ phận, nhóm
+      const countFactoryTypes = (nodes) => {
+        if (!nodes || !Array.isArray(nodes)) return { factories: 0, divisions: 0, teams: 0 }
+
+        let stats = { factories: 0, divisions: 0, teams: 0 }
+
+        nodes.forEach(node => {
+          if (node.factory_type === 'factory') {
+            stats.factories++
+          } else if (node.factory_type === 'division') {
+            stats.divisions++
+          } else if (node.factory_type === 'team') {
+            stats.teams++
+          }
+
+          // Đệ quy đếm các node con
+          if (node.children && node.children.length > 0) {
+            const childStats = countFactoryTypes(node.children)
+            stats.factories += childStats.factories
+            stats.divisions += childStats.divisions
+            stats.teams += childStats.teams
+          }
+        })
+
+        return stats
+      }
+
+      return countFactoryTypes(this.treeData)
+    },
     filteredTreeData() {
       if (!this.searchQuery) {
         return this.treeData
@@ -235,13 +282,13 @@ export default {
 
         return nodes.filter(node => {
           // Kiểm tra nếu node hiện tại khớp với từ khóa tìm kiếm
-          const nodeMatches = 
+          const nodeMatches =
             node.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
             node.code.toLowerCase().includes(this.searchQuery.toLowerCase())
 
           // Lọc các node con
           const filteredChildren = filterTree(node.children)
-          
+
           // Nếu có node con khớp, giữ lại node cha
           if (filteredChildren.length > 0) {
             node.children = filteredChildren
@@ -268,7 +315,7 @@ export default {
       }
 
       const allFactories = flattenFactories(this.treeData)
-      
+
       // Lọc theo ràng buộc
       if (this.formData.factory_type === 'division') {
         // Bộ phận chỉ có thể thuộc xí nghiệp
@@ -277,7 +324,7 @@ export default {
         // Nhóm chỉ có thể thuộc bộ phận
         return allFactories.filter(factory => factory.factory_type === 'division')
       }
-      
+
       // Xí nghiệp không có parent
       return []
     }
@@ -295,7 +342,9 @@ export default {
     }),
     initModal() {
       this.$nextTick(() => {
-        this.factoryModal = new Modal(this.$refs.factoryModal)
+        if (this.$refs.factoryModal) {
+          this.factoryModal = new Modal(this.$refs.factoryModal)
+        }
       })
     },
     async fetchFactoryTree() {
@@ -305,6 +354,8 @@ export default {
       try {
         const response = await this.fetchFactoryTreeData()
         this.treeData = response
+
+        console.log('Fetched factory tree:', this.treeData)
 
         // Mở rộng tất cả các node nếu initialExpanded = true
         if (this.initialExpanded) {
@@ -320,7 +371,7 @@ export default {
     expandAll() {
       const expandNodes = (nodes) => {
         if (!nodes) return
-        
+
         nodes.forEach(node => {
           this.expandedNodes.add(node.id)
           if (node.children && node.children.length > 0) {
@@ -328,7 +379,7 @@ export default {
           }
         })
       }
-      
+
       expandNodes(this.treeData)
     },
     collapseAll() {
@@ -360,7 +411,7 @@ export default {
     handleAddChild(parentFactory) {
       this.isEdit = false
       this.selectedParentId = parentFactory ? parentFactory.id : null
-      
+
       // Xác định loại xí nghiệp con dựa trên loại xí nghiệp cha
       let childType = 'factory'
       if (parentFactory) {
@@ -370,7 +421,7 @@ export default {
           childType = 'team'
         }
       }
-      
+
       this.formData = {
         id: null,
         code: this.generateFactoryCode(),
@@ -381,7 +432,7 @@ export default {
         capacity: '',
         established_date: null
       }
-      
+
       this.formError = null
       this.factoryModal.show()
     },
@@ -401,19 +452,19 @@ export default {
 
       try {
         const factoryData = { ...this.formData }
-        
+
         if (this.isEdit) {
           await this.updateFactory({ id: factoryData.id, data: factoryData })
         } else {
           await this.createFactory(factoryData)
         }
-        
+
         // Cập nhật lại cây xí nghiệp
         await this.fetchFactoryTree()
-        
+
         // Đóng modal
         this.factoryModal.hide()
-        
+
         // Hiển thị thông báo thành công
         this.$emit('factory-saved', {
           success: true,
@@ -430,15 +481,15 @@ export default {
     },
     async confirmDelete() {
       if (!this.factoryToDelete) return
-      
+
       this.loading = true
-      
+
       try {
         await this.deleteFactory(this.factoryToDelete.id)
-        
+
         // Cập nhật lại cây xí nghiệp
         await this.fetchFactoryTree()
-        
+
         // Hiển thị thông báo thành công
         this.$emit('factory-saved', {
           success: true,
@@ -470,7 +521,7 @@ export default {
     max-height: 600px;
     overflow-y: auto;
   }
-  
+
   .tree-root {
     list-style: none;
     padding-left: 0;

@@ -42,7 +42,11 @@ class FactoryViewSet(viewsets.ModelViewSet):
         from .serializers import FactoryTreeSerializer
         serializer = FactoryTreeSerializer(root_factories, many=True)
 
-        return Response(serializer.data)
+        # Trả về dữ liệu theo định dạng tương thích với frontend
+        return Response({
+            'success': True,
+            'data': serializer.data
+        })
 
     @action(detail=True, methods=['get'])
     def children(self, request, pk=None):
@@ -168,12 +172,33 @@ def get_factory_tree_json(request):
             result = []
             for factory in factories:
                 children = factory.get_children()
+                # Lấy danh sách nhân viên thuộc xí nghiệp
+                employees = factory.employees.all().values('id', 'code', 'full_name', 'avatar', 'job_title__name', 'department__name', 'status', 'join_date')
+
+                # Chuyển đổi các trường để phù hợp với frontend
+                employees_list = []
+                for emp in employees:
+                    employee_dict = {
+                        'id': emp['id'],
+                        'code': emp['code'],
+                        'full_name': emp['full_name'],
+                        'avatar': emp['avatar'],
+                        'job_title_name': emp['job_title__name'],
+                        'department_name': emp['department__name'],
+                        'factory_name': factory.name,
+                        'status': emp['status'],
+                        'join_date': emp['join_date']
+                    }
+                    employees_list.append(employee_dict)
+
                 factory_dict = {
                     'id': factory.id,
                     'name': factory.name,
                     'code': factory.code,
-                    'type': factory.factory_type,
-                    'children': build_tree(children) if children else []
+                    'factory_type': factory.factory_type,
+                    'type': factory.factory_type,  # Giữ lại để tương thích
+                    'children': build_tree(children) if children else [],
+                    'employees': employees_list
                 }
                 result.append(factory_dict)
             return result

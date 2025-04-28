@@ -96,6 +96,7 @@ export default {
 
       try {
         const response = await FactoryService.getFactoryTree()
+        console.log('API response for factory tree:', response)
 
         let treeData = []
         if (response.data) {
@@ -106,6 +107,7 @@ export default {
           }
         }
 
+        console.log('Factory tree data to commit:', treeData)
         commit('SET_FACTORY_TREE', treeData)
         return Promise.resolve(treeData)
       } catch (error) {

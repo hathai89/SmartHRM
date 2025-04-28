@@ -1,7 +1,6 @@
 <template>
   <div class="document-list">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1 class="h3">Quản lý tài liệu</h1>
+    <div class="d-flex justify-content-end align-items-center mb-4">
       <div class="d-flex">
         <button class="btn btn-outline-secondary me-2" @click="refreshData">
           <font-awesome-icon icon="sync" :class="{ 'fa-spin': loading }" />
