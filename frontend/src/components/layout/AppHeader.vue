@@ -160,8 +160,8 @@
                 <h6>{{ $t('notifications.title') }}</h6>
               </div>
               <div class="dropdown-body">
-                <div v-if="notifications.length === 0" class="dropdown-item text-center">
-                  {{ $t('notifications.noNotifications') }}
+                <div v-if="!notifications || notifications.length === 0" class="dropdown-item text-center">
+                  {{ $t('notifications.noNotifications') || 'Không có thông báo' }}
                 </div>
                 <template v-else>
                   <a v-for="notification in notifications.slice(0, 5)" :key="notification.id"
@@ -183,12 +183,12 @@
                   </a>
                 </template>
               </div>
-              <div class="dropdown-footer" v-if="notifications.length > 0">
+              <div class="dropdown-footer" v-if="notifications && notifications.length > 0">
                 <button class="btn btn-sm btn-link" @click="markAllAsRead">
-                  {{ $t('notifications.markAllAsRead') }}
+                  {{ $t('notifications.markAllAsRead') || 'Đánh dấu tất cả đã đọc' }}
                 </button>
                 <router-link to="/notifications" class="btn btn-sm btn-link">
-                  {{ $t('notifications.viewAll') }}
+                  {{ $t('notifications.viewAll') || 'Xem tất cả' }}
                 </router-link>
               </div>
             </div>

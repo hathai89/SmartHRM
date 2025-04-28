@@ -8,8 +8,21 @@
       <p class="mt-3 text-light">Đang tải ứng dụng...</p>
     </div>
 
+    <!-- Thông báo lỗi -->
+    <error-notification
+      :show="hasError"
+      :message="error"
+      @close="clearError"
+    />
+
+    <!-- Thông báo offline -->
+    <offline-notification
+      :show="showOfflineNotification"
+      @close="hideOfflineNotification"
+    />
+
     <!-- Main Application -->
-    <div v-else>
+    <div v-if="isReady">
       <app-layout v-if="isAuthenticated">
         <breadcrumb :items="breadcrumbs" />
         <router-view />
@@ -23,12 +36,16 @@
 import BreadcrumbNav from '@/components/common/Breadcrumb.vue';
 import { getBreadcrumbs } from '@/utils/breadcrumb';
 import AppLayout from '@/components/layout/AppLayout.vue';
+import ErrorNotification from '@/components/common/ErrorNotification.vue';
+import OfflineNotification from '@/components/common/OfflineNotification.vue';
 
 export default {
   name: 'App',
   components: {
     Breadcrumb: BreadcrumbNav,
-    AppLayout
+    AppLayout,
+    ErrorNotification,
+    OfflineNotification
   },
   data() {
     return {
@@ -48,6 +65,18 @@ export default {
     companyName() {
       const companyInfo = this.$store.getters['company/companyInfo'];
       return companyInfo ? companyInfo.name : 'SmartHRM';
+    },
+    hasError() {
+      return this.$store.getters.hasError;
+    },
+    error() {
+      return this.$store.getters.error;
+    },
+    showOfflineNotification() {
+      return this.$store.getters['app/showOfflineNotification'];
+    },
+    isOffline() {
+      return this.$store.getters['app/isOffline'];
     }
   },
   created() {
@@ -56,6 +85,12 @@ export default {
 
     // Lấy thông tin công ty
     this.fetchCompanyInfo();
+
+    // Kiểm tra kết nối đến backend
+    this.checkBackendConnection();
+
+    // Thiết lập kiểm tra kết nối định kỳ
+    this.setupConnectionCheck();
   },
   methods: {
     async checkAuth() {
@@ -83,6 +118,25 @@ export default {
       } catch (error) {
         console.error('Lỗi khi lấy thông tin công ty:', error);
       }
+    },
+
+    clearError() {
+      this.$store.dispatch('clearError');
+    },
+
+    hideOfflineNotification() {
+      this.$store.dispatch('app/hideOfflineNotification');
+    },
+
+    async checkBackendConnection() {
+      await this.$store.dispatch('app/checkBackendConnection');
+    },
+
+    setupConnectionCheck() {
+      // Kiểm tra kết nối mỗi 30 giây
+      setInterval(() => {
+        this.checkBackendConnection();
+      }, 30000);
     }
   }
 }
@@ -162,6 +216,8 @@ ul {
   font-size: 1.2rem;
   background: linear-gradient(135deg, $gradient-start 0%, $gradient-middle 50%, $gradient-end 100%);
 }
+
+// CSS cho thông báo lỗi đã được chuyển sang component ErrorNotification
 
 // Gradient backgrounds
 .bg-gradient-primary {

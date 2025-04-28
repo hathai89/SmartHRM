@@ -15,18 +15,45 @@ module.exports = defineConfig({
 
   // Cấu hình proxy cho API trong development
   devServer: {
-    port: 8080,
+    port: 8083, // Sử dụng port 8083 vì đó là port mà server đang chạy
+    // Không sử dụng middleware để xử lý lỗi kết nối
+    // Để proxy xử lý tất cả các request
+    setupMiddlewares: (middlewares, devServer) => {
+      if (!devServer) {
+        throw new Error('webpack-dev-server is not defined');
+      }
+
+      return middlewares;
+    },
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true
+        target: 'http://localhost:8001',
+        changeOrigin: true,
+        logLevel: 'debug',
+        timeout: 5000, // 5 giây timeout
+        onProxyReq(proxyReq, req, res) {
+          // Log request
+          console.log(`Proxy request: ${req.method} ${req.url}`);
+        },
+        onError: (err, req, res) => {
+          console.log('Proxy error:', err);
+          // Lỗi sẽ được xử lý bởi middleware ở trên
+          if (!res.headersSent) {
+            res.writeHead(500, {
+              'Content-Type': 'application/json'
+            });
+            res.end(JSON.stringify({
+              error: 'Không thể kết nối đến máy chủ API. Đang chuyển sang chế độ offline.'
+            }));
+          }
+        }
       },
       '/media': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8001',
         changeOrigin: true
       },
       '/static': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8001',
         changeOrigin: true
       }
     },

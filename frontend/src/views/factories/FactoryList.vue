@@ -41,7 +41,7 @@
 
     <template v-else>
       <div class="row">
-        <div class="col-lg-4 mb-4" v-for="factory in filteredFactories" :key="factory.id">
+        <div class="col-lg-4 mb-4" v-for="(factory, index) in validFilteredFactories" :key="factory.id || index">
           <div class="card h-100 factory-card">
             <div class="card-header d-flex justify-content-between align-items-center">
               <h5 class="mb-0">{{ factory.name }}</h5>
@@ -310,18 +310,34 @@ export default {
       employeesData: 'employees/allEmployees'
     }),
     filteredFactories() {
+      // Đảm bảo this.factories là một mảng
+      if (!this.factories || !Array.isArray(this.factories)) {
+        return []
+      }
+
+      // Lọc bỏ các phần tử null hoặc undefined
+      const validFactories = this.factories.filter(factory => factory != null)
+
       if (!this.searchQuery) {
-        return this.factories
+        return validFactories
       }
 
       const query = this.searchQuery.toLowerCase()
-      return this.factories.filter(factory =>
+      return validFactories.filter(factory =>
         factory.code.toLowerCase().includes(query) ||
         factory.name.toLowerCase().includes(query) ||
         (factory.manager && factory.manager.toLowerCase().includes(query)) ||
         (factory.address && factory.address.toLowerCase().includes(query)) ||
         (factory.description && factory.description.toLowerCase().includes(query))
       )
+    },
+    validFilteredFactories() {
+      // Đảm bảo this.filteredFactories là một mảng
+      if (!this.filteredFactories || !Array.isArray(this.filteredFactories)) {
+        return []
+      }
+
+      return this.filteredFactories.filter(factory => factory != null)
     }
   },
   mounted() {

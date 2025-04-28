@@ -10,9 +10,9 @@ export default {
     socket: null
   },
   getters: {
-    allNotifications: state => state.notifications,
-    unreadNotifications: state => state.notifications.filter(n => !n.is_read),
-    unreadCount: state => state.unreadCount,
+    allNotifications: state => state.notifications || [],
+    unreadNotifications: state => (state.notifications || []).filter(n => !n.is_read),
+    unreadCount: state => state.unreadCount || 0,
     isLoading: state => state.loading,
     hasError: state => !!state.error,
     error: state => state.error,
@@ -68,20 +68,29 @@ export default {
     async fetchNotifications({ commit }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await NotificationService.getNotifications()
         commit('SET_NOTIFICATIONS', response.data.results)
         commit('SET_UNREAD_COUNT', response.data.unread_count)
         return Promise.resolve(response.data)
       } catch (error) {
-        commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra khi tải thông báo')
-        return Promise.reject(error)
+        console.error('Lỗi khi tải thông báo:', error)
+
+        // Sử dụng mảng rỗng khi không thể lấy thông báo
+        commit('SET_NOTIFICATIONS', [])
+        commit('SET_UNREAD_COUNT', 0)
+
+        // Không hiển thị lỗi cho người dùng vì đây không phải là lỗi quan trọng
+        // commit('SET_ERROR', 'Không thể tải thông báo. Vui lòng thử lại sau.')
+
+        // Trả về dữ liệu mặc định thay vì reject promise
+        return Promise.resolve({ results: [], unread_count: 0 })
       } finally {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async markAsRead({ commit }, id) {
       try {
         await NotificationService.markAsRead(id)
@@ -92,7 +101,7 @@ export default {
         return Promise.reject(error)
       }
     },
-    
+
     async markAllAsRead({ commit }) {
       try {
         await NotificationService.markAllAsRead()
@@ -103,7 +112,7 @@ export default {
         return Promise.reject(error)
       }
     },
-    
+
     async deleteNotification({ commit }, id) {
       try {
         await NotificationService.deleteNotification(id)
@@ -114,34 +123,38 @@ export default {
         return Promise.reject(error)
       }
     },
-    
+
     setupWebSocket({ commit, dispatch }) {
       const token = localStorage.getItem('token')
       if (!token) return
-      
+
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
       const socket = new WebSocket(`${protocol}//${window.location.host}/ws/notifications/?token=${token}`)
-      
+
       socket.onmessage = (event) => {
-        const data = JSON.parse(event.data)
-        
-        if (data.type === 'notification') {
-          commit('ADD_NOTIFICATION', data.notification)
-        } else if (data.type === 'unread_count') {
-          commit('SET_UNREAD_COUNT', data.count)
+        try {
+          const data = JSON.parse(event.data)
+
+          if (data.type === 'notification') {
+            commit('ADD_NOTIFICATION', data.notification)
+          } else if (data.type === 'unread_count') {
+            commit('SET_UNREAD_COUNT', data.count)
+          }
+        } catch (error) {
+          console.error('Lỗi khi parse dữ liệu từ WebSocket:', error)
         }
       }
-      
+
       socket.onclose = () => {
         // Thử kết nối lại sau 5 giây
         setTimeout(() => {
           dispatch('setupWebSocket')
         }, 5000)
       }
-      
+
       commit('SET_SOCKET', socket)
     },
-    
+
     closeWebSocket({ state }) {
       if (state.socket) {
         state.socket.close()

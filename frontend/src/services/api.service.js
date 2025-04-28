@@ -51,11 +51,15 @@ apiClient.interceptors.response.use(
     return response
   },
   error => {
+    // Tạo biến để lưu thông báo lỗi
+    let errorMessage = '';
+
     if (error.response) {
       // Xử lý lỗi 401 Unauthorized
       if (error.response.status === 401) {
         localStorage.removeItem('token')
         localStorage.removeItem('user')
+        errorMessage = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
 
         // Chuyển hướng đến trang đăng nhập nếu không phải đang ở trang đăng nhập
         if (router.currentRoute.value.name !== 'login') {
@@ -68,26 +72,40 @@ apiClient.interceptors.response.use(
 
       // Xử lý lỗi 403 Forbidden
       if (error.response.status === 403) {
-        // Hiển thị thông báo lỗi quyền truy cập
-        console.error('Bạn không có quyền truy cập vào tài nguyên này')
+        errorMessage = 'Bạn không có quyền truy cập vào tài nguyên này.';
+        console.error(errorMessage);
       }
 
       // Xử lý lỗi 404 Not Found
       if (error.response.status === 404) {
+        errorMessage = 'Không tìm thấy tài nguyên yêu cầu.';
+        console.error(errorMessage);
         // Có thể chuyển hướng đến trang 404
         // router.push({ name: 'not-found' })
       }
 
       // Xử lý lỗi 500 Internal Server Error
       if (error.response.status === 500) {
-        console.error('Lỗi máy chủ nội bộ')
+        errorMessage = 'Lỗi máy chủ nội bộ. Vui lòng thử lại sau.';
+        console.error(errorMessage);
       }
-    } else if (error.request) {
-      // Yêu cầu đã được gửi nhưng không nhận được phản hồi
-      console.error('Không thể kết nối đến máy chủ')
+    } else if (error.code === 'ECONNABORTED') {
+      // Xử lý lỗi timeout
+      errorMessage = 'Yêu cầu đã hết thời gian chờ. Vui lòng thử lại sau.';
+      console.error(errorMessage);
+    } else if (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED' || error.message.includes('Network Error') || !error.response) {
+      // Xử lý lỗi kết nối mạng
+      errorMessage = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng của bạn.';
+      console.error(errorMessage);
     } else {
       // Có lỗi khi thiết lập yêu cầu
-      console.error('Lỗi:', error.message)
+      errorMessage = `Đã xảy ra lỗi: ${error.message}`;
+      console.error(errorMessage);
+    }
+
+    // Dispatch action để hiển thị thông báo lỗi trong store
+    if (errorMessage && window.store) {
+      window.store.dispatch('setError', errorMessage);
     }
 
     return Promise.reject(error)

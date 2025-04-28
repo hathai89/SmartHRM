@@ -103,7 +103,7 @@
                   <p class="mb-0 text-muted">Không tìm thấy nhân viên nào</p>
                 </td>
               </tr>
-              <tr v-for="employee in paginatedEmployees" :key="employee.id">
+              <tr v-for="(employee, index) in validPaginatedEmployees" :key="employee.id || index">
                 <td>{{ employee.employee_id }}</td>
                 <td>
                   <div class="d-flex align-items-center">
@@ -259,7 +259,13 @@ export default {
       factoriesData: 'factories/allFactories'
     }),
     filteredEmployees() {
-      let result = [...this.employees]
+      // Đảm bảo this.employees là một mảng
+      if (!this.employees || !Array.isArray(this.employees)) {
+        return []
+      }
+
+      // Lọc bỏ các phần tử null hoặc undefined
+      let result = this.employees.filter(employee => employee != null)
 
       // Tìm kiếm
       if (this.searchQuery) {
@@ -267,8 +273,8 @@ export default {
         result = result.filter(employee =>
           employee.employee_id.toLowerCase().includes(query) ||
           employee.full_name.toLowerCase().includes(query) ||
-          employee.email.toLowerCase().includes(query) ||
-          employee.phone.toLowerCase().includes(query)
+          (employee.email && employee.email.toLowerCase().includes(query)) ||
+          (employee.phone && employee.phone.toLowerCase().includes(query))
         )
       }
 
@@ -317,6 +323,14 @@ export default {
       const start = (this.currentPage - 1) * this.perPage
       const end = start + this.perPage
       return this.filteredEmployees.slice(start, end)
+    },
+    validPaginatedEmployees() {
+      // Đảm bảo this.paginatedEmployees là một mảng
+      if (!this.paginatedEmployees || !Array.isArray(this.paginatedEmployees)) {
+        return []
+      }
+
+      return this.paginatedEmployees.filter(employee => employee != null)
     },
     totalPages() {
       return Math.ceil(this.filteredEmployees.length / this.perPage)

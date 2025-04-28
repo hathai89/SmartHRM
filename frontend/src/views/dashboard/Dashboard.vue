@@ -160,7 +160,7 @@
                 <h5 class="card-title mb-0">Thông báo</h5>
               </div>
               <div class="card-body">
-                <div v-if="notifications.length === 0" class="text-center py-3">
+                <div v-if="!notifications || notifications.length === 0" class="text-center py-3">
                   <p class="text-muted">Không có thông báo nào</p>
                 </div>
                 <ul v-else class="list-group list-group-flush">
@@ -180,7 +180,7 @@
                     </div>
                   </li>
                 </ul>
-                <div class="text-center mt-3">
+                <div v-if="notifications && notifications.length > 0" class="text-center mt-3">
                   <router-link to="/notifications" class="btn btn-sm btn-outline-primary">
                     Xem tất cả thông báo
                   </router-link>
@@ -243,19 +243,19 @@ export default {
           apiClient.get('/dashboard/activities/')
         ]);
 
-        // Cập nhật thống kê
+        // Cập nhật thống kê với xử lý an toàn
         this.stats = {
-          totalEmployees: employeesResponse.data.count || employeesResponse.data.results.length,
-          totalDepartments: departmentsResponse.data.count || departmentsResponse.data.results.length,
-          totalFactories: factoriesResponse.data.count || factoriesResponse.data.results.length,
-          totalDocuments: documentsResponse.data.count || documentsResponse.data.results.length
+          totalEmployees: employeesResponse.data?.count || (employeesResponse.data?.results || []).length || 0,
+          totalDepartments: departmentsResponse.data?.count || (departmentsResponse.data?.results || []).length || 0,
+          totalFactories: factoriesResponse.data?.count || (factoriesResponse.data?.results || []).length || 0,
+          totalDocuments: documentsResponse.data?.count || (documentsResponse.data?.results || []).length || 0
         }
 
-        // Cập nhật hoạt động gần đây
-        if (activitiesResponse.data.results) {
+        // Cập nhật hoạt động gần đây với xử lý an toàn
+        if (activitiesResponse.data?.results) {
           this.activities = activitiesResponse.data.results;
         } else {
-          // Không có dữ liệu hoạt động
+          // Không có dữ liệu hoạt động hoặc dữ liệu không hợp lệ
           this.activities = [];
         }
       } catch (error) {

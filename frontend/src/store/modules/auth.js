@@ -1,6 +1,22 @@
 import AuthService from '@/services/auth.service'
 
-const user = JSON.parse(localStorage.getItem('user'))
+// Lấy dữ liệu người dùng từ localStorage và xử lý an toàn
+let user = null;
+try {
+  const userStr = localStorage.getItem('user');
+  // Kiểm tra xem userStr có giá trị hợp lệ không
+  if (userStr && userStr !== 'undefined' && userStr !== 'null') {
+    user = JSON.parse(userStr);
+  } else {
+    // Xóa dữ liệu không hợp lệ
+    localStorage.removeItem('user');
+  }
+} catch (error) {
+  console.error('Lỗi khi parse dữ liệu người dùng từ localStorage:', error);
+  // Xóa dữ liệu không hợp lệ
+  localStorage.removeItem('user');
+}
+
 const initialState = user
   ? { status: { loggedIn: true }, user }
   : { status: { loggedIn: false }, user: null }
@@ -83,7 +99,19 @@ export default {
         const updatedUser = response.data
 
         // Cập nhật thông tin người dùng trong localStorage
-        const currentUser = JSON.parse(localStorage.getItem('user'))
+        let currentUser = null;
+        try {
+          const userStr = localStorage.getItem('user');
+          if (userStr && userStr !== 'undefined' && userStr !== 'null') {
+            currentUser = JSON.parse(userStr);
+          } else {
+            currentUser = {};
+          }
+        } catch (error) {
+          console.error('Lỗi khi parse dữ liệu người dùng từ localStorage:', error);
+          currentUser = {};
+        }
+
         const newUserData = { ...currentUser, ...updatedUser }
         localStorage.setItem('user', JSON.stringify(newUserData))
 
@@ -106,16 +134,23 @@ export default {
     updateUserAvatar({ commit }, avatarUrl) {
       try {
         // Cập nhật avatar trong localStorage
-        const currentUser = JSON.parse(localStorage.getItem('user'))
-        if (currentUser) {
-          currentUser.avatar = avatarUrl
-          localStorage.setItem('user', JSON.stringify(currentUser))
+        let currentUser = null;
+        try {
+          const userStr = localStorage.getItem('user');
+          if (userStr && userStr !== 'undefined' && userStr !== 'null') {
+            currentUser = JSON.parse(userStr);
+            currentUser.avatar = avatarUrl;
+            localStorage.setItem('user', JSON.stringify(currentUser));
+          }
+        } catch (error) {
+          console.error('Lỗi khi parse dữ liệu người dùng từ localStorage:', error);
         }
 
         // Cập nhật avatar trong state
         commit('UPDATE_USER', { avatar: avatarUrl })
         return Promise.resolve()
       } catch (error) {
+        console.error('Lỗi khi cập nhật avatar:', error);
         return Promise.reject(error)
       }
     }

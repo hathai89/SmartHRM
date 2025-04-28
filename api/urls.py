@@ -8,6 +8,7 @@ from api.views.document import DocumentViewSet, DocumentCategoryViewSet
 from api.views.notification import NotificationViewSet
 from api.views.dashboard import DashboardViewSet
 from api.views.csrf import CsrfViewSet
+from api.views.health import HealthCheckView
 from company.api import CompanyViewSet
 
 # Tạo router
@@ -34,4 +35,5 @@ router.register(r'dashboard', DashboardViewSet, basename='dashboard')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('health-check/', HealthCheckView.as_view(), name='health-check'),
 ]

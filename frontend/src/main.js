@@ -3,6 +3,9 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
+// Lưu store vào window để có thể truy cập từ bất kỳ đâu
+window.store = store
+
 // Import Bootstrap và BootstrapVue
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css'
@@ -25,7 +28,7 @@ import {
   faBars, faUserPlus, faEllipsisV, faTrashAlt, faKey, faCamera, faIdCard,
   faFile, faCheckCircle, faCheckDouble, faBellSlash, faAngleDoubleLeft,
   faAngleLeft, faAngleRight, faAngleDoubleRight, faDatabase, faUsersCog,
-  faPaperPlane, faUndo, faEllipsisH, faTachometerAlt
+  faPaperPlane, faUndo, faEllipsisH, faTachometerAlt, faUserCircle
 } from '@fortawesome/free-solid-svg-icons'
 
 // Import i18n
@@ -46,7 +49,7 @@ library.add(
   faBars, faUserPlus, faEllipsisV, faTrashAlt, faKey, faCamera, faIdCard,
   faFile, faCheckCircle, faCheckDouble, faBellSlash, faAngleDoubleLeft,
   faAngleLeft, faAngleRight, faAngleDoubleRight, faDatabase, faUsersCog,
-  faPaperPlane, faUndo, faEllipsisH, faTachometerAlt
+  faPaperPlane, faUndo, faEllipsisH, faTachometerAlt, faUserCircle
 )
 
 // i18n đã được cấu hình trong file i18n.js

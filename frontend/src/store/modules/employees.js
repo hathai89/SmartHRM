@@ -60,24 +60,33 @@ export default {
     async fetchEmployees({ commit }, { page = 1, limit = 10, search = '', department = null, factory = null, status = null }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await EmployeeService.getEmployees(page, limit, search, department, factory, status)
         commit('SET_EMPLOYEES', response.data.results)
         commit('SET_TOTAL_ITEMS', response.data.count)
         return Promise.resolve(response.data)
       } catch (error) {
-        commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra khi tải danh sách nhân viên')
-        return Promise.reject(error)
+        console.error('Lỗi khi tải danh sách nhân viên:', error)
+
+        // Sử dụng mảng rỗng khi không thể lấy danh sách nhân viên
+        commit('SET_EMPLOYEES', [])
+        commit('SET_TOTAL_ITEMS', 0)
+
+        // Hiển thị thông báo lỗi thân thiện
+        commit('SET_ERROR', 'Không thể tải danh sách nhân viên. Vui lòng thử lại sau.')
+
+        // Trả về dữ liệu mặc định thay vì reject promise
+        return Promise.resolve({ results: [], count: 0 })
       } finally {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async fetchEmployee({ commit }, id) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await EmployeeService.getEmployee(id)
         commit('SET_EMPLOYEE', response.data)
@@ -89,11 +98,11 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async createEmployee({ commit }, employeeData) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await EmployeeService.createEmployee(employeeData)
         commit('ADD_EMPLOYEE', response.data)
@@ -105,11 +114,11 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async updateEmployee({ commit }, { id, data }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await EmployeeService.updateEmployee(id, data)
         commit('UPDATE_EMPLOYEE', response.data)
@@ -121,11 +130,11 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async deleteEmployee({ commit }, id) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         await EmployeeService.deleteEmployee(id)
         commit('REMOVE_EMPLOYEE', id)

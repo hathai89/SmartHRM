@@ -57,7 +57,7 @@
 
     <template v-else>
       <div class="row">
-        <div class="col-lg-4 mb-4" v-for="document in filteredDocuments" :key="document.id">
+        <div class="col-lg-4 mb-4" v-for="(document, index) in validFilteredDocuments" :key="document.id || index">
           <div class="card h-100 document-card">
             <div class="card-header d-flex justify-content-between align-items-center">
               <div class="document-icon">
@@ -402,7 +402,13 @@ export default {
       isLoading: 'documents/isLoading'
     }),
     filteredDocuments() {
-      let result = [...this.documents]
+      // Đảm bảo this.documents là một mảng
+      if (!this.documents || !Array.isArray(this.documents)) {
+        return []
+      }
+
+      // Lọc bỏ các phần tử null hoặc undefined
+      let result = this.documents.filter(doc => doc != null)
 
       // Lọc theo danh mục
       if (this.categoryFilter) {
@@ -415,8 +421,8 @@ export default {
         result = result.filter(doc =>
           doc.name.toLowerCase().includes(query) ||
           (doc.description && doc.description.toLowerCase().includes(query)) ||
-          doc.file_type.toLowerCase().includes(query) ||
-          doc.uploaded_by.toLowerCase().includes(query)
+          (doc.file_type && doc.file_type.toLowerCase().includes(query)) ||
+          (doc.uploaded_by && doc.uploaded_by.toLowerCase().includes(query))
         )
       }
 
@@ -437,6 +443,14 @@ export default {
       }
 
       return result
+    },
+    validFilteredDocuments() {
+      // Đảm bảo this.filteredDocuments là một mảng
+      if (!this.filteredDocuments || !Array.isArray(this.filteredDocuments)) {
+        return []
+      }
+
+      return this.filteredDocuments.filter(doc => doc != null)
     }
   },
   mounted() {
@@ -467,11 +481,15 @@ export default {
       this.loading = true
 
       try {
-        // Trong thực tế, bạn sẽ gọi API để lấy dữ liệu
-        // await this.fetchAllDocuments()
+        // Lấy danh sách tài liệu từ API
+        await this.fetchAllDocuments()
 
-        // Giả lập API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        // Lấy danh sách danh mục tài liệu từ API
+        await this.fetchAllCategories()
+
+        // Cập nhật dữ liệu local từ store
+        this.documents = this.documentsData
+        this.categories = this.categoriesData
       } catch (error) {
         console.error('Error fetching documents:', error)
         this.setError('Không thể tải danh sách tài liệu. Vui lòng thử lại sau.')
@@ -565,28 +583,11 @@ export default {
         formData.append('category_id', this.formData.category_id)
         formData.append('description', this.formData.description || '')
 
-        // Trong thực tế, bạn sẽ gọi API để tải lên tài liệu
-        // await this.uploadNewDocument(formData)
+        // Gọi API để tải lên tài liệu
+        await this.uploadNewDocument(formData)
 
-        // Giả lập API call
-        await new Promise(resolve => setTimeout(resolve, 1500))
-
-        // Thêm vào danh sách
-        const fileType = this.selectedFile.name.split('.').pop().toUpperCase()
-        const newDocument = {
-          id: this.documents.length + 1,
-          name: this.formData.name,
-          category_id: parseInt(this.formData.category_id),
-          description: this.formData.description,
-          file_type: fileType,
-          file_size: this.selectedFile.size,
-          file_url: `/documents/${this.selectedFile.name}`,
-          uploaded_by: 'Người dùng hiện tại',
-          upload_date: new Date().toISOString(),
-          last_modified: new Date().toISOString()
-        }
-
-        this.documents.unshift(newDocument)
+        // Cập nhật lại danh sách tài liệu từ API
+        await this.fetchDocuments()
 
         // Hiển thị thông báo thành công
         this.setSuccess('Tải lên tài liệu thành công.')
@@ -608,23 +609,11 @@ export default {
         // Chuẩn bị dữ liệu
         const documentData = { ...this.formData }
 
-        // Trong thực tế, bạn sẽ gọi API để cập nhật tài liệu
-        // await this.updateDocumentInfo({ id: documentData.id, data: documentData })
+        // Gọi API để cập nhật tài liệu
+        await this.updateDocumentInfo({ id: documentData.id, data: documentData })
 
-        // Giả lập API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        // Cập nhật dữ liệu trong danh sách
-        const index = this.documents.findIndex(d => d.id === documentData.id)
-        if (index !== -1) {
-          this.documents[index] = {
-            ...this.documents[index],
-            name: documentData.name,
-            category_id: parseInt(documentData.category_id),
-            description: documentData.description,
-            last_modified: new Date().toISOString()
-          }
-        }
+        // Cập nhật lại danh sách tài liệu từ API
+        await this.fetchDocuments()
 
         // Hiển thị thông báo thành công
         this.setSuccess('Cập nhật tài liệu thành công.')
@@ -648,14 +637,11 @@ export default {
       this.loading = true
 
       try {
-        // Trong thực tế, bạn sẽ gọi API để xóa tài liệu
-        // await this.removeDocument(this.documentToDelete.id)
+        // Gọi API để xóa tài liệu
+        await this.removeDocument(this.documentToDelete.id)
 
-        // Giả lập API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        // Xóa tài liệu khỏi danh sách
-        this.documents = this.documents.filter(d => d.id !== this.documentToDelete.id)
+        // Cập nhật lại danh sách tài liệu từ API
+        await this.fetchDocuments()
 
         // Hiển thị thông báo thành công
         this.setSuccess(`Đã xóa tài liệu ${this.documentToDelete.name} thành công`)

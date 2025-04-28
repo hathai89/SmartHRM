@@ -41,7 +41,7 @@
 
     <template v-else>
       <div class="row">
-        <div class="col-lg-4 mb-4" v-for="department in filteredDepartments" :key="department.id">
+        <div class="col-lg-4 mb-4" v-for="(department, index) in validFilteredDepartments" :key="department.id || index">
           <div class="card h-100 department-card">
             <div class="card-header d-flex justify-content-between align-items-center">
               <h5 class="mb-0">{{ department.name }}</h5>
@@ -292,17 +292,33 @@ export default {
       employeesData: 'employees/allEmployees'
     }),
     filteredDepartments() {
+      // Đảm bảo this.departments là một mảng
+      if (!this.departments || !Array.isArray(this.departments)) {
+        return []
+      }
+
+      // Lọc bỏ các phần tử null hoặc undefined
+      const validDepartments = this.departments.filter(department => department != null)
+
       if (!this.searchQuery) {
-        return this.departments
+        return validDepartments
       }
 
       const query = this.searchQuery.toLowerCase()
-      return this.departments.filter(department =>
+      return validDepartments.filter(department =>
         department.code.toLowerCase().includes(query) ||
         department.name.toLowerCase().includes(query) ||
         (department.manager && department.manager.toLowerCase().includes(query)) ||
         (department.description && department.description.toLowerCase().includes(query))
       )
+    },
+    validFilteredDepartments() {
+      // Đảm bảo this.filteredDepartments là một mảng
+      if (!this.filteredDepartments || !Array.isArray(this.filteredDepartments)) {
+        return []
+      }
+
+      return this.filteredDepartments.filter(department => department != null)
     }
   },
   mounted() {

@@ -27,8 +27,23 @@ const actions = {
       commit('SET_COMPANY', response.data);
       return response.data;
     } catch (error) {
-      commit('SET_ERROR', error.message || 'Không thể tải thông tin công ty');
-      throw error;
+      console.error('Lỗi khi tải thông tin công ty:', error);
+
+      // Sử dụng dữ liệu mặc định khi không thể lấy từ API
+      const defaultCompany = {
+        name: 'CÔNG TY CỔ PHẦN DỆT MAY 29/3',
+        logo: null,
+        address: 'Địa chỉ công ty',
+        phone: 'Số điện thoại',
+        email: 'email@company.com',
+        website: 'https://company.com'
+      };
+
+      commit('SET_COMPANY', defaultCompany);
+      commit('SET_ERROR', 'Đang sử dụng thông tin công ty mặc định.');
+
+      // Không throw error để không làm gián đoạn luồng ứng dụng
+      return defaultCompany;
     } finally {
       commit('SET_LOADING', false);
     }
