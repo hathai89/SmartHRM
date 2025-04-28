@@ -27,7 +27,7 @@ module.exports = defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:8001',
+        target: 'http://localhost:8000',
         changeOrigin: true,
         logLevel: 'debug',
         timeout: 5000, // 5 giây timeout
@@ -49,11 +49,11 @@ module.exports = defineConfig({
         }
       },
       '/media': {
-        target: 'http://localhost:8001',
+        target: 'http://localhost:8000',
         changeOrigin: true
       },
       '/static': {
-        target: 'http://localhost:8001',
+        target: 'http://localhost:8000',
         changeOrigin: true
       }
     },

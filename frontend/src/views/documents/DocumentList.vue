@@ -482,17 +482,38 @@ export default {
 
       try {
         // Lấy danh sách tài liệu từ API
-        await this.fetchAllDocuments()
+        await this.fetchAllDocuments({})
 
         // Lấy danh sách danh mục tài liệu từ API
         await this.fetchAllCategories()
 
         // Cập nhật dữ liệu local từ store
-        this.documents = this.documentsData
-        this.categories = this.categoriesData
+        // Đảm bảo dữ liệu tài liệu là một mảng hợp lệ
+        if (Array.isArray(this.documentsData)) {
+          this.documents = this.documentsData.filter(doc =>
+            doc && typeof doc === 'object'
+          )
+        } else {
+          console.error('Dữ liệu tài liệu không phải là mảng:', this.documentsData)
+          this.documents = []
+        }
+
+        // Đảm bảo dữ liệu danh mục là một mảng hợp lệ
+        if (Array.isArray(this.categoriesData)) {
+          this.categories = this.categoriesData.filter(cat =>
+            cat && typeof cat === 'object' && cat.id != null
+          )
+        } else {
+          console.error('Dữ liệu danh mục không phải là mảng:', this.categoriesData)
+          this.categories = []
+        }
       } catch (error) {
         console.error('Error fetching documents:', error)
         this.setError('Không thể tải danh sách tài liệu. Vui lòng thử lại sau.')
+
+        // Đặt giá trị mặc định cho các mảng dữ liệu
+        this.documents = []
+        this.categories = []
       } finally {
         this.loading = false
       }
@@ -669,32 +690,55 @@ export default {
       }, 1000)
     },
     getCategoryName(categoryId) {
-      const category = this.categories.find(c => c.id === categoryId)
-      return category ? category.name : 'Không xác định'
+      // Kiểm tra nếu categoryId không tồn tại
+      if (categoryId === null || categoryId === undefined) {
+        return 'Không xác định'
+      }
+
+      // Đảm bảo categoryId là số nếu có thể
+      const id = typeof categoryId === 'string' ? parseInt(categoryId, 10) : categoryId
+
+      // Kiểm tra nếu categories không phải là mảng
+      if (!Array.isArray(this.categories)) {
+        console.error('Danh sách danh mục không phải là mảng:', this.categories)
+        return 'Không xác định'
+      }
+
+      const category = this.categories.find(c => c && c.id === id)
+      return category && category.name ? category.name : 'Không xác định'
     },
     getDocumentIcon(fileType) {
-      switch (fileType.toLowerCase()) {
-        case 'pdf':
-          return ['far', 'file-pdf']
-        case 'docx':
-        case 'doc':
-          return ['far', 'file-word']
-        case 'xlsx':
-        case 'xls':
-          return ['far', 'file-excel']
-        case 'pptx':
-        case 'ppt':
-          return ['far', 'file-powerpoint']
-        case 'jpg':
-        case 'jpeg':
-        case 'png':
-        case 'gif':
-          return ['far', 'file-image']
-        case 'zip':
-        case 'rar':
-          return ['far', 'file-archive']
-        default:
-          return ['far', 'file']
+      if (!fileType) {
+        return ['far', 'file']
+      }
+
+      try {
+        switch (fileType.toLowerCase()) {
+          case 'pdf':
+            return ['far', 'file-pdf']
+          case 'docx':
+          case 'doc':
+            return ['far', 'file-word']
+          case 'xlsx':
+          case 'xls':
+            return ['far', 'file-excel']
+          case 'pptx':
+          case 'ppt':
+            return ['far', 'file-powerpoint']
+          case 'jpg':
+          case 'jpeg':
+          case 'png':
+          case 'gif':
+            return ['far', 'file-image']
+          case 'zip':
+          case 'rar':
+            return ['far', 'file-archive']
+          default:
+            return ['far', 'file']
+        }
+      } catch (error) {
+        console.error('Lỗi khi xác định biểu tượng tài liệu:', error)
+        return ['far', 'file']
       }
     },
     formatDate(dateString) {

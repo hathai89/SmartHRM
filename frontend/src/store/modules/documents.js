@@ -57,26 +57,51 @@ export default {
     }
   },
   actions: {
-    async fetchDocuments({ commit }, { category = null, type = null, search = '' }) {
+    async fetchDocuments({ commit }, { category = null, type = null, search = '' } = {}) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await DocumentService.getDocuments(category, type, search)
-        commit('SET_DOCUMENTS', response.data)
-        return Promise.resolve(response.data)
+
+        // Kiểm tra và xử lý dữ liệu trả về
+        let documents = []
+        if (response.data) {
+          if (Array.isArray(response.data)) {
+            documents = response.data
+          } else if (response.data.results && Array.isArray(response.data.results)) {
+            documents = response.data.results
+          } else if (typeof response.data === 'object') {
+            // Nếu là object, chuyển đổi thành mảng
+            console.log('Chuyển đổi dữ liệu tài liệu từ object sang mảng')
+            documents = Object.values(response.data).filter(item => item && typeof item === 'object')
+          }
+        }
+
+        // Đảm bảo mỗi tài liệu có thuộc tính category_id
+        documents = documents.map(doc => {
+          if (!doc.category_id && doc.category) {
+            return { ...doc, category_id: doc.category }
+          }
+          return doc
+        })
+
+        commit('SET_DOCUMENTS', documents)
+        return Promise.resolve(documents)
       } catch (error) {
+        console.error('Lỗi khi tải danh sách tài liệu:', error)
         commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra khi tải danh sách tài liệu')
+        commit('SET_DOCUMENTS', []) // Đặt mảng rỗng khi có lỗi
         return Promise.reject(error)
       } finally {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async fetchDocument({ commit }, id) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await DocumentService.getDocument(id)
         commit('SET_DOCUMENT', response.data)
@@ -88,27 +113,44 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async fetchCategories({ commit }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await DocumentService.getCategories()
-        commit('SET_CATEGORIES', response.data)
-        return Promise.resolve(response.data)
+
+        // Kiểm tra và xử lý dữ liệu trả về
+        let categories = []
+        if (response.data) {
+          if (Array.isArray(response.data)) {
+            categories = response.data
+          } else if (response.data.results && Array.isArray(response.data.results)) {
+            categories = response.data.results
+          } else if (typeof response.data === 'object') {
+            // Nếu là object, chuyển đổi thành mảng
+            console.log('Chuyển đổi dữ liệu danh mục từ object sang mảng')
+            categories = Object.values(response.data).filter(item => item && typeof item === 'object')
+          }
+        }
+
+        commit('SET_CATEGORIES', categories)
+        return Promise.resolve(categories)
       } catch (error) {
+        console.error('Lỗi khi tải danh mục tài liệu:', error)
         commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra khi tải danh mục tài liệu')
+        commit('SET_CATEGORIES', []) // Đặt mảng rỗng khi có lỗi
         return Promise.reject(error)
       } finally {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async createDocument({ commit }, documentData) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await DocumentService.createDocument(documentData)
         commit('ADD_DOCUMENT', response.data)
@@ -120,11 +162,11 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async updateDocument({ commit }, { id, data }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await DocumentService.updateDocument(id, data)
         commit('UPDATE_DOCUMENT', response.data)
@@ -136,11 +178,11 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async deleteDocument({ commit }, id) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         await DocumentService.deleteDocument(id)
         commit('REMOVE_DOCUMENT', id)

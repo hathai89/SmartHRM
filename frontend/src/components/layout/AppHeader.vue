@@ -122,6 +122,78 @@
               </ul>
             </li>
 
+            <!-- Tuyển dụng -->
+            <li class="nav-item dropdown">
+              <a href="#" class="nav-link" @click.prevent="toggleDropdown('recruitment')">
+                <font-awesome-icon icon="user-tie" />
+                <span>Tuyển dụng</span>
+                <font-awesome-icon icon="chevron-down" class="dropdown-icon" />
+              </a>
+              <ul class="dropdown-menu" :class="{ 'show': activeDropdown === 'recruitment' }">
+                <li>
+                  <router-link to="/job-postings" class="dropdown-item">
+                    <font-awesome-icon icon="list" />
+                    <span>Tin tuyển dụng</span>
+                  </router-link>
+                </li>
+                <li v-if="isAdmin">
+                  <router-link to="/job-postings/create" class="dropdown-item">
+                    <font-awesome-icon icon="plus" />
+                    <span>Thêm tin tuyển dụng</span>
+                  </router-link>
+                </li>
+                <li>
+                  <router-link to="/job-applications" class="dropdown-item">
+                    <font-awesome-icon icon="file-signature" />
+                    <span>Đơn ứng tuyển</span>
+                  </router-link>
+                </li>
+                <li>
+                  <router-link to="/interviews" class="dropdown-item">
+                    <font-awesome-icon icon="calendar-check" />
+                    <span>Lịch phỏng vấn</span>
+                  </router-link>
+                </li>
+              </ul>
+            </li>
+
+            <!-- Tài sản -->
+            <li class="nav-item dropdown">
+              <a href="#" class="nav-link" @click.prevent="toggleDropdown('assets')">
+                <font-awesome-icon icon="laptop" />
+                <span>Tài sản</span>
+                <font-awesome-icon icon="chevron-down" class="dropdown-icon" />
+              </a>
+              <ul class="dropdown-menu" :class="{ 'show': activeDropdown === 'assets' }">
+                <li>
+                  <router-link to="/assets" class="dropdown-item">
+                    <font-awesome-icon icon="list" />
+                    <span>Danh sách tài sản</span>
+                  </router-link>
+                </li>
+                <li v-if="isAdmin">
+                  <router-link to="/assets/create" class="dropdown-item">
+                    <font-awesome-icon icon="plus" />
+                    <span>Thêm tài sản</span>
+                  </router-link>
+                </li>
+                <li v-if="isAdmin">
+                  <router-link to="/asset-categories" class="dropdown-item">
+                    <font-awesome-icon icon="tags" />
+                    <span>Danh mục tài sản</span>
+                  </router-link>
+                </li>
+              </ul>
+            </li>
+
+            <!-- Công ty -->
+            <li class="nav-item">
+              <router-link to="/company" class="nav-link">
+                <font-awesome-icon icon="building" />
+                <span>Công ty</span>
+              </router-link>
+            </li>
+
             <!-- Quản trị (chỉ cho admin) -->
             <li v-if="isAdmin" class="nav-item dropdown">
               <a href="#" class="nav-link" @click.prevent="toggleDropdown('admin')">
@@ -376,7 +448,7 @@ export default {
 
 <style lang="scss" scoped>
 .app-header {
-  background: linear-gradient(90deg, #0a3d62 0%, #ff7f50 100%);
+  background: linear-gradient(90deg, #0a3d62 0%, #0a3d62 60%, #ff7f50 100%);
   color: white;
   position: fixed;
   top: 0;
@@ -385,16 +457,16 @@ export default {
   z-index: 1000;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   padding: 0;
-  height: 60px;
+  height: 50px;
 
   @media (max-width: 991px) {
-    height: 60px;
-    min-height: 60px;
+    height: 50px;
+    min-height: 50px;
   }
 
   @media (max-width: 767px) {
-    height: 60px;
-    min-height: 60px;
+    height: 50px;
+    min-height: 50px;
   }
 
   .container-fluid {
@@ -406,11 +478,14 @@ export default {
     align-items: center;
     justify-content: space-between;
     height: 100%;
-    padding: 0 1rem;
+    padding: 0 0.5rem;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
 
     @media (max-width: 991px) {
       flex-wrap: wrap;
-      padding: 10px 1rem;
+      padding: 10px 0.5rem;
       position: relative;
       justify-content: flex-start;
     }
@@ -420,9 +495,17 @@ export default {
   .main-nav {
     flex: 1;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     position: relative;
-    margin: 0 20px;
+    margin: 0 10px;
+    overflow-x: auto;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    &::-webkit-scrollbar {
+      display: none;
+    }
 
     @media (max-width: 991px) {
       position: static;
@@ -474,7 +557,7 @@ export default {
 
       @media (max-width: 991px) {
         position: fixed;
-        top: 60px;
+        top: 50px;
         left: 0;
         right: 0;
         flex-direction: column;
@@ -483,7 +566,7 @@ export default {
         display: none;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         z-index: 1020;
-        max-height: calc(100vh - 60px);
+        max-height: calc(100vh - 50px);
         overflow-y: auto;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
         opacity: 0;
@@ -503,11 +586,13 @@ export default {
         .nav-link {
           display: flex;
           align-items: center;
-          padding: 0 1rem;
-          height: 60px;
+          padding: 0 0.5rem;
+          height: 50px;
           color: white;
           font-weight: 500;
           transition: all 0.3s ease;
+          white-space: nowrap;
+          font-size: 0.9rem;
 
           @media (max-width: 991px) {
             height: auto;
@@ -528,14 +613,14 @@ export default {
           }
 
           svg {
-            margin-right: 0.5rem;
-            width: 20px;
+            margin-right: 0.3rem;
+            width: 16px;
             text-align: center;
-            font-size: 1rem;
+            font-size: 0.9rem;
           }
 
           span {
-            margin-right: 0.5rem;
+            margin-right: 0.3rem;
           }
 
           .dropdown-icon {
@@ -547,7 +632,7 @@ export default {
 
         &.dropdown {
           .nav-link {
-            padding-right: 1.5rem;
+            padding-right: 0.8rem;
           }
 
           &.active .dropdown-icon {
@@ -623,6 +708,7 @@ export default {
   .brand {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
 
     @media (max-width: 991px) {
       max-width: 60%;
@@ -636,12 +722,12 @@ export default {
       font-weight: 600;
 
       .brand-logo {
-        height: 40px;
-        margin-right: 0.75rem;
+        height: 36px;
+        margin-right: 0.5rem;
         border-radius: 4px;
 
         @media (max-width: 576px) {
-          height: 32px;
+          height: 30px;
         }
       }
 
@@ -669,7 +755,8 @@ export default {
   .header-right {
     display: flex;
     align-items: center;
-    margin-left: 1rem;
+    margin-left: 0.5rem;
+    flex-shrink: 0;
 
     @media (max-width: 991px) {
       position: absolute;

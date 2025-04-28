@@ -103,13 +103,13 @@
                   <p class="mb-0 text-muted">Không tìm thấy nhân viên nào</p>
                 </td>
               </tr>
-              <tr v-for="(employee, index) in validPaginatedEmployees" :key="employee.id || index">
-                <td>{{ employee.employee_id }}</td>
+              <tr v-for="(employee, index) in validPaginatedEmployees" :key="index">
+                <td>{{ employee ? employee.employee_id : '' }}</td>
                 <td>
                   <div class="d-flex align-items-center">
                     <div class="avatar-sm me-2">
                       <img
-                        v-if="employee.avatar"
+                        v-if="employee && employee.avatar"
                         :src="employee.avatar"
                         alt="Avatar"
                         class="avatar-img"
@@ -118,29 +118,31 @@
                         <font-awesome-icon icon="user" />
                       </div>
                     </div>
-                    {{ employee.full_name }}
+                    {{ employee ? employee.full_name : '' }}
                   </div>
                 </td>
-                <td>{{ employee.department }}</td>
-                <td>{{ employee.factory }}</td>
-                <td>{{ employee.job_title }}</td>
-                <td>{{ formatDate(employee.hire_date) }}</td>
+                <td>{{ employee ? employee.department : '' }}</td>
+                <td>{{ employee ? employee.factory : '' }}</td>
+                <td>{{ employee ? employee.job_title : '' }}</td>
+                <td>{{ employee ? formatDate(employee.hire_date) : 'N/A' }}</td>
                 <td>
                   <span
                     class="badge"
                     :class="{
-                      'bg-success': employee.status === 'active',
-                      'bg-warning': employee.status === 'probation',
-                      'bg-danger': employee.status === 'terminated'
+                      'bg-success': employee && employee.status === 'active',
+                      'bg-warning': employee && employee.status === 'probation',
+                      'bg-danger': employee && employee.status === 'terminated',
+                      'bg-secondary': !employee || !employee.status
                     }"
                     style="border-radius: 4px; padding: 5px 8px;"
                   >
-                    {{ getStatusText(employee.status) }}
+                    {{ employee ? getStatusText(employee.status) : 'Không xác định' }}
                   </span>
                 </td>
                 <td class="text-center">
                   <div class="btn-group">
                     <router-link
+                      v-if="employee && employee.id"
                       :to="'/employees/' + employee.id"
                       class="btn btn-sm btn-outline-primary"
                       title="Xem chi tiết"
@@ -148,6 +150,7 @@
                       <font-awesome-icon icon="eye" />
                     </router-link>
                     <router-link
+                      v-if="employee && employee.id"
                       :to="'/employees/' + employee.id + '/edit'"
                       class="btn btn-sm btn-outline-secondary"
                       title="Chỉnh sửa"
@@ -155,6 +158,7 @@
                       <font-awesome-icon icon="edit" />
                     </router-link>
                     <button
+                      v-if="employee && employee.id"
                       class="btn btn-sm btn-outline-danger"
                       title="Xóa"
                       @click="confirmDelete(employee)"
@@ -264,58 +268,95 @@ export default {
         return []
       }
 
-      // Lọc bỏ các phần tử null hoặc undefined
-      let result = this.employees.filter(employee => employee != null)
+      // Lọc bỏ các phần tử null, undefined hoặc không có id
+      let result = this.employees.filter(employee =>
+        employee != null && typeof employee === 'object' && employee.id != null && employee.id !== undefined
+      )
 
       // Tìm kiếm
       if (this.searchQuery) {
         const query = this.searchQuery.toLowerCase()
-        result = result.filter(employee =>
-          employee.employee_id.toLowerCase().includes(query) ||
-          employee.full_name.toLowerCase().includes(query) ||
-          (employee.email && employee.email.toLowerCase().includes(query)) ||
-          (employee.phone && employee.phone.toLowerCase().includes(query))
-        )
+        result = result.filter(employee => {
+          try {
+            return (
+              (employee.employee_id && employee.employee_id.toLowerCase().includes(query)) ||
+              (employee.full_name && employee.full_name.toLowerCase().includes(query)) ||
+              (employee.email && employee.email.toLowerCase().includes(query)) ||
+              (employee.phone && employee.phone.toLowerCase().includes(query))
+            )
+          } catch (error) {
+            console.error('Lỗi khi tìm kiếm nhân viên:', error, employee)
+            return false
+          }
+        })
       }
 
       // Lọc theo phòng ban
       if (this.departmentFilter) {
-        result = result.filter(employee =>
-          employee.department_id === parseInt(this.departmentFilter)
-        )
+        result = result.filter(employee => {
+          try {
+            return employee.department_id === parseInt(this.departmentFilter)
+          } catch (error) {
+            console.error('Lỗi khi lọc theo phòng ban:', error, employee)
+            return false
+          }
+        })
       }
 
       // Lọc theo xí nghiệp
       if (this.factoryFilter) {
-        result = result.filter(employee =>
-          employee.factory_id === parseInt(this.factoryFilter)
-        )
+        result = result.filter(employee => {
+          try {
+            return employee.factory_id === parseInt(this.factoryFilter)
+          } catch (error) {
+            console.error('Lỗi khi lọc theo xí nghiệp:', error, employee)
+            return false
+          }
+        })
       }
 
       // Lọc theo trạng thái
       if (this.statusFilter) {
-        result = result.filter(employee =>
-          employee.status === this.statusFilter
-        )
+        result = result.filter(employee => {
+          try {
+            return employee.status === this.statusFilter
+          } catch (error) {
+            console.error('Lỗi khi lọc theo trạng thái:', error, employee)
+            return false
+          }
+        })
       }
 
       // Sắp xếp
-      result.sort((a, b) => {
-        let valueA = a[this.sortKey]
-        let valueB = b[this.sortKey]
+      try {
+        result.sort((a, b) => {
+          try {
+            let valueA = a[this.sortKey]
+            let valueB = b[this.sortKey]
 
-        // Xử lý các trường hợp đặc biệt
-        if (this.sortKey === 'hire_date') {
-          valueA = new Date(valueA)
-          valueB = new Date(valueB)
-        }
+            // Xử lý các trường hợp đặc biệt
+            if (this.sortKey === 'hire_date') {
+              valueA = new Date(valueA || null)
+              valueB = new Date(valueB || null)
+            }
 
-        if (this.sortOrder === 'asc') {
-          return valueA > valueB ? 1 : -1
-        } else {
-          return valueA < valueB ? 1 : -1
-        }
-      })
+            // Xử lý trường hợp giá trị null hoặc undefined
+            if (valueA === null || valueA === undefined) return this.sortOrder === 'asc' ? -1 : 1
+            if (valueB === null || valueB === undefined) return this.sortOrder === 'asc' ? 1 : -1
+
+            if (this.sortOrder === 'asc') {
+              return valueA > valueB ? 1 : -1
+            } else {
+              return valueA < valueB ? 1 : -1
+            }
+          } catch (error) {
+            console.error('Lỗi khi so sánh nhân viên:', error, a, b)
+            return 0
+          }
+        })
+      } catch (error) {
+        console.error('Lỗi khi sắp xếp danh sách nhân viên:', error)
+      }
 
       return result
     },
@@ -330,7 +371,18 @@ export default {
         return []
       }
 
-      return this.paginatedEmployees.filter(employee => employee != null)
+      try {
+        // Lọc bỏ các phần tử null, undefined hoặc không có id
+        return this.paginatedEmployees.filter(employee =>
+          employee != null &&
+          typeof employee === 'object' &&
+          employee.id != null &&
+          employee.id !== undefined
+        )
+      } catch (error) {
+        console.error('Lỗi khi lọc danh sách nhân viên phân trang:', error)
+        return []
+      }
     },
     totalPages() {
       return Math.ceil(this.filteredEmployees.length / this.perPage)
@@ -402,11 +454,43 @@ export default {
         ])
 
         // Cập nhật dữ liệu local từ store
-        this.employees = this.employeesData
-        this.departments = this.departmentsData
-        this.factories = this.factoriesData
+        // Đảm bảo dữ liệu nhân viên là một mảng hợp lệ
+        if (Array.isArray(this.employeesData)) {
+          this.employees = this.employeesData.filter(employee =>
+            employee && typeof employee === 'object' && employee.id != null
+          )
+        } else {
+          console.error('Dữ liệu nhân viên không phải là mảng:', this.employeesData)
+          this.employees = []
+        }
+
+        // Đảm bảo dữ liệu phòng ban là một mảng hợp lệ
+        if (Array.isArray(this.departmentsData)) {
+          this.departments = this.departmentsData.filter(dept =>
+            dept && typeof dept === 'object' && dept.id != null
+          )
+        } else {
+          console.error('Dữ liệu phòng ban không phải là mảng:', this.departmentsData)
+          this.departments = []
+        }
+
+        // Đảm bảo dữ liệu xí nghiệp là một mảng hợp lệ
+        if (Array.isArray(this.factoriesData)) {
+          this.factories = this.factoriesData.filter(factory =>
+            factory && typeof factory === 'object' && factory.id != null
+          )
+        } else {
+          console.error('Dữ liệu xí nghiệp không phải là mảng:', this.factoriesData)
+          this.factories = []
+        }
       } catch (error) {
         console.error('Error fetching data:', error)
+        this.$store.dispatch('setError', 'Không thể tải dữ liệu. Vui lòng thử lại sau.')
+
+        // Đặt giá trị mặc định cho các mảng dữ liệu
+        this.employees = []
+        this.departments = []
+        this.factories = []
       } finally {
         this.loading = false
       }
@@ -436,12 +520,23 @@ export default {
       }
     },
     formatDate(dateString) {
-      if (!dateString) return null
+      if (!dateString) return 'N/A'
 
-      const date = new Date(dateString)
-      return date.toLocaleDateString('vi-VN')
+      try {
+        const date = new Date(dateString)
+        // Kiểm tra xem ngày có hợp lệ không
+        if (isNaN(date.getTime())) {
+          return 'N/A'
+        }
+        return date.toLocaleDateString('vi-VN')
+      } catch (error) {
+        console.error('Error formatting date:', error)
+        return 'N/A'
+      }
     },
     getStatusText(status) {
+      if (!status) return 'Không xác định'
+
       switch (status) {
         case 'active':
           return 'Đang làm việc'
@@ -454,11 +549,23 @@ export default {
       }
     },
     confirmDelete(employee) {
+      // Kiểm tra employee có hợp lệ không
+      if (!employee || !employee.id) {
+        console.error('Không thể xóa nhân viên: ID không hợp lệ')
+        this.$store.dispatch('setError', 'Không thể xóa nhân viên: ID không hợp lệ')
+        return
+      }
+
       this.employeeToDelete = employee
       this.showDeleteConfirm = true
     },
     async deleteEmployee() {
-      if (!this.employeeToDelete) return
+      if (!this.employeeToDelete || !this.employeeToDelete.id) {
+        this.$store.dispatch('setError', 'Không thể xóa nhân viên: ID không hợp lệ')
+        this.showDeleteConfirm = false
+        this.employeeToDelete = null
+        return
+      }
 
       this.loading = true
 
@@ -470,7 +577,7 @@ export default {
         this.employees = this.employeesData
 
         // Hiển thị thông báo thành công
-        this.$store.dispatch('setSuccess', `Đã xóa nhân viên ${this.employeeToDelete.full_name} thành công`)
+        this.$store.dispatch('setSuccess', `Đã xóa nhân viên ${this.employeeToDelete.full_name || 'đã chọn'} thành công`)
       } catch (error) {
         console.error('Error deleting employee:', error)
         this.$store.dispatch('setError', 'Không thể xóa nhân viên. Vui lòng thử lại sau.')

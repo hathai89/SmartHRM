@@ -28,7 +28,9 @@ import {
   faBars, faUserPlus, faEllipsisV, faTrashAlt, faKey, faCamera, faIdCard,
   faFile, faCheckCircle, faCheckDouble, faBellSlash, faAngleDoubleLeft,
   faAngleLeft, faAngleRight, faAngleDoubleRight, faDatabase, faUsersCog,
-  faPaperPlane, faUndo, faEllipsisH, faTachometerAlt, faUserCircle
+  faPaperPlane, faUndo, faEllipsisH, faTachometerAlt, faUserCircle,
+  // Thêm biểu tượng cho menu mới
+  faUserTie, faFileSignature, faCalendarCheck, faLaptop, faTags
 } from '@fortawesome/free-solid-svg-icons'
 
 // Import i18n
@@ -49,7 +51,9 @@ library.add(
   faBars, faUserPlus, faEllipsisV, faTrashAlt, faKey, faCamera, faIdCard,
   faFile, faCheckCircle, faCheckDouble, faBellSlash, faAngleDoubleLeft,
   faAngleLeft, faAngleRight, faAngleDoubleRight, faDatabase, faUsersCog,
-  faPaperPlane, faUndo, faEllipsisH, faTachometerAlt, faUserCircle
+  faPaperPlane, faUndo, faEllipsisH, faTachometerAlt, faUserCircle,
+  // Thêm biểu tượng cho menu mới
+  faUserTie, faFileSignature, faCalendarCheck, faLaptop, faTags
 )
 
 // i18n đã được cấu hình trong file i18n.js

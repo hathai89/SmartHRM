@@ -55,23 +55,40 @@ export default {
     async fetchFactories({ commit }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await FactoryService.getFactories()
-        commit('SET_FACTORIES', response.data)
-        return Promise.resolve(response.data)
+
+        // Kiểm tra và xử lý dữ liệu trả về
+        let factories = []
+        if (response.data) {
+          if (Array.isArray(response.data)) {
+            factories = response.data
+          } else if (response.data.results && Array.isArray(response.data.results)) {
+            factories = response.data.results
+          } else if (typeof response.data === 'object') {
+            // Nếu là object, chuyển đổi thành mảng
+            console.log('Chuyển đổi dữ liệu xí nghiệp từ object sang mảng')
+            factories = Object.values(response.data).filter(item => item && typeof item === 'object')
+          }
+        }
+
+        commit('SET_FACTORIES', factories)
+        return Promise.resolve(factories)
       } catch (error) {
+        console.error('Lỗi khi tải danh sách xí nghiệp:', error)
         commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra khi tải danh sách xí nghiệp')
+        commit('SET_FACTORIES', []) // Đặt mảng rỗng khi có lỗi
         return Promise.reject(error)
       } finally {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async fetchFactory({ commit }, id) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await FactoryService.getFactory(id)
         commit('SET_FACTORY', response.data)
@@ -83,11 +100,11 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async createFactory({ commit }, factoryData) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await FactoryService.createFactory(factoryData)
         commit('ADD_FACTORY', response.data)
@@ -99,11 +116,11 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async updateFactory({ commit }, { id, data }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await FactoryService.updateFactory(id, data)
         commit('UPDATE_FACTORY', response.data)
@@ -115,11 +132,11 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async deleteFactory({ commit }, id) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         await FactoryService.deleteFactory(id)
         commit('REMOVE_FACTORY', id)

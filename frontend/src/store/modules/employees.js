@@ -63,9 +63,18 @@ export default {
 
       try {
         const response = await EmployeeService.getEmployees(page, limit, search, department, factory, status)
-        commit('SET_EMPLOYEES', response.data.results)
-        commit('SET_TOTAL_ITEMS', response.data.count)
-        return Promise.resolve(response.data)
+
+        // Đảm bảo dữ liệu trả về là một mảng và lọc bỏ các phần tử không hợp lệ
+        let employees = Array.isArray(response.data.results) ? response.data.results : []
+
+        // Lọc bỏ các phần tử null, undefined hoặc không có id
+        employees = employees.filter(employee =>
+          employee && typeof employee === 'object' && employee.id != null && employee.id !== undefined
+        )
+
+        commit('SET_EMPLOYEES', employees)
+        commit('SET_TOTAL_ITEMS', response.data.count || 0)
+        return Promise.resolve({ ...response.data, results: employees })
       } catch (error) {
         console.error('Lỗi khi tải danh sách nhân viên:', error)
 

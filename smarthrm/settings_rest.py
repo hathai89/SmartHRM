@@ -34,12 +34,14 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8082",
     "http://localhost:8083",
     "http://127.0.0.1:8083",
+    "http://localhost:8084",
+    "http://127.0.0.1:8084",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
 ]
 
 # Cho phép tất cả origins trong môi trường phát triển
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
 
 # Cho phép same-origin requests trong production
 CORS_ALLOW_SAME_ORIGIN = True

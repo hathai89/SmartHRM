@@ -55,23 +55,40 @@ export default {
     async fetchDepartments({ commit }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await DepartmentService.getDepartments()
-        commit('SET_DEPARTMENTS', response.data)
-        return Promise.resolve(response.data)
+
+        // Kiểm tra và xử lý dữ liệu trả về
+        let departments = []
+        if (response.data) {
+          if (Array.isArray(response.data)) {
+            departments = response.data
+          } else if (response.data.results && Array.isArray(response.data.results)) {
+            departments = response.data.results
+          } else if (typeof response.data === 'object') {
+            // Nếu là object, chuyển đổi thành mảng
+            console.log('Chuyển đổi dữ liệu phòng ban từ object sang mảng')
+            departments = Object.values(response.data).filter(item => item && typeof item === 'object')
+          }
+        }
+
+        commit('SET_DEPARTMENTS', departments)
+        return Promise.resolve(departments)
       } catch (error) {
+        console.error('Lỗi khi tải danh sách phòng ban:', error)
         commit('SET_ERROR', error.response?.data?.message || 'Có lỗi xảy ra khi tải danh sách phòng ban')
+        commit('SET_DEPARTMENTS', []) // Đặt mảng rỗng khi có lỗi
         return Promise.reject(error)
       } finally {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async fetchDepartment({ commit }, id) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await DepartmentService.getDepartment(id)
         commit('SET_DEPARTMENT', response.data)
@@ -83,11 +100,11 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async createDepartment({ commit }, departmentData) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await DepartmentService.createDepartment(departmentData)
         commit('ADD_DEPARTMENT', response.data)
@@ -99,11 +116,11 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async updateDepartment({ commit }, { id, data }) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         const response = await DepartmentService.updateDepartment(id, data)
         commit('UPDATE_DEPARTMENT', response.data)
@@ -115,11 +132,11 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    
+
     async deleteDepartment({ commit }, id) {
       commit('SET_LOADING', true)
       commit('CLEAR_ERROR')
-      
+
       try {
         await DepartmentService.deleteDepartment(id)
         commit('REMOVE_DEPARTMENT', id)

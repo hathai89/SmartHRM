@@ -15,29 +15,6 @@
       </div>
 
       <template v-else>
-        <!-- Welcome message -->
-        <div class="card mb-4 card-gradient">
-          <div class="card-header">
-            <h5 class="mb-0">Chào mừng đến với hệ thống quản lý nhân sự</h5>
-          </div>
-          <div class="card-body">
-            <div class="d-flex align-items-center">
-              <div class="me-4">
-                <img v-if="companyInfo && companyInfo.logo_url" :src="companyInfo.logo_url" alt="Logo công ty" style="max-height: 80px; max-width: 100%;">
-                <i v-else class="fas fa-building fa-4x text-primary"></i>
-              </div>
-              <div>
-                <h4 class="mb-2">{{ companyInfo ? companyInfo.name : 'Đang tải...' }}</h4>
-                <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i>{{ companyInfo ? companyInfo.address : 'Đang tải...' }}</p>
-                <p class="mb-1"><i class="fas fa-phone me-2"></i>{{ companyInfo ? companyInfo.phone : 'Đang tải...' }}</p>
-                <p class="mb-0"><i class="fas fa-envelope me-2"></i>{{ companyInfo ? companyInfo.email : 'Đang tải...' }}</p>
-              </div>
-            </div>
-            <div class="mt-3">
-              <p class="card-text">{{ new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}</p>
-            </div>
-          </div>
-        </div>
 
         <!-- Stats cards -->
         <div class="row">
@@ -63,7 +40,7 @@
           </div>
 
           <div class="col-md-3 col-sm-6 mb-4">
-            <div class="card dashboard-card bg-gradient-horizontal text-white">
+            <div class="card dashboard-card bg-gradient-primary text-white">
               <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
@@ -84,7 +61,7 @@
           </div>
 
           <div class="col-md-3 col-sm-6 mb-4">
-            <div class="card dashboard-card card-accent text-white">
+            <div class="card dashboard-card bg-gradient-primary text-white">
               <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
@@ -155,7 +132,7 @@
           </div>
 
           <div class="col-lg-4 mb-4">
-            <div class="card card-accent">
+            <div class="card card-gradient">
               <div class="card-header">
                 <h5 class="card-title mb-0">Thông báo</h5>
               </div>
@@ -344,20 +321,6 @@ export default {
     }
   }
 
-  .card-accent {
-    border: none;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-
-    .card-header {
-      background: linear-gradient(90deg, var(--accent-color, #ff6600) 0%, var(--accent-light, #ff9933) 100%);
-      color: white;
-      border: none;
-      padding: 1rem 1.5rem;
-    }
-  }
-
   .dashboard-card {
     height: 100%;
     border: none;
@@ -394,10 +357,6 @@ export default {
 
   .bg-gradient-primary {
     background: linear-gradient(135deg, var(--primary-color, #003366) 0%, var(--primary-light, #0066cc) 100%);
-  }
-
-  .bg-gradient-horizontal {
-    background: linear-gradient(90deg, var(--primary-color, #003366) 0%, var(--accent-color, #ff6600) 100%);
   }
 }
 </style>
