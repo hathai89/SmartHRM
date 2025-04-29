@@ -638,7 +638,7 @@
                   <h5 class="form-section-title border-bottom pb-2">Hồ sơ và thông tin nghề nghiệp</h5>
                   <div class="row">
                     <div class="col-md-6 mb-3">
-                      <label for="resume" class="form-label">CV của bạn</label>
+                      <label for="resume" class="form-label">CV của bạn (không bắt buộc)</label>
                       <input
                         id="resume"
                         type="file"
@@ -705,7 +705,7 @@
                     </div>
 
                     <div class="col-md-12 mb-3">
-                      <label for="experience" class="form-label">Kinh nghiệm làm việc</label>
+                      <label for="experience" class="form-label">Kinh nghiệm làm việc (không bắt buộc)</label>
                       <textarea
                         id="experience"
                         v-model="formData.experience"
@@ -719,7 +719,7 @@
                     </div>
 
                     <div class="col-md-12 mb-3">
-                      <label for="skills" class="form-label">Kỹ năng</label>
+                      <label for="skills" class="form-label">Kỹ năng (không bắt buộc)</label>
                       <textarea
                         id="skills"
                         v-model="formData.skills"
@@ -1273,7 +1273,8 @@ export default {
         }
       }
 
-      // Thông tin chuyên môn không bắt buộc
+      // Thông tin chuyên môn
+      // Kinh nghiệm, kỹ năng và CV không bắt buộc
 
       // Điều khoản
       if (!this.formData.agree_terms) {
@@ -1346,9 +1347,22 @@ export default {
         // Đổi tên trường agree_terms để phù hợp với API
         formData.append('agree_terms', this.formData.agree_terms ? 'true' : 'false')
 
-        // Tạo full_name từ first_name và last_name nếu cả hai đều có
+        // Tạo full_name từ first_name và last_name
+        // Nếu cả hai đều có, kết hợp chúng
         if (this.formData.first_name && this.formData.last_name) {
           formData.append('full_name', `${this.formData.last_name} ${this.formData.first_name}`)
+        }
+        // Nếu chỉ có last_name, sử dụng nó làm full_name
+        else if (this.formData.last_name) {
+          formData.append('full_name', this.formData.last_name)
+        }
+        // Nếu chỉ có first_name, sử dụng nó làm full_name
+        else if (this.formData.first_name) {
+          formData.append('full_name', this.formData.first_name)
+        }
+        // Nếu không có cả hai, sử dụng "Không có tên" làm full_name
+        else {
+          formData.append('full_name', "Không có tên")
         }
 
         // Gửi đơn ứng tuyển thông qua store

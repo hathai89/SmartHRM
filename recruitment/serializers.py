@@ -219,7 +219,7 @@ class JobApplicationDetailSerializer(serializers.ModelSerializer):
         return InterviewListSerializer(interviews, many=True).data
 
 class JobApplicationCreateSerializer(serializers.ModelSerializer):
-    agree_terms = serializers.BooleanField(write_only=True, required=True)
+    agree_terms = serializers.BooleanField(write_only=True, required=False)
 
     class Meta:
         model = JobApplication
@@ -246,7 +246,7 @@ class JobApplicationCreateSerializer(serializers.ModelSerializer):
             'military_service', 'military_service_date', 'military_service_end_date', 'military_service_role',
 
             # Thông tin chuyên môn
-            'education', 'experience', 'skills', 'resume', 'avatar', 'cover_letter',
+            'education_level', 'education_detail', 'experience', 'skills', 'resume', 'avatar', 'cover_letter',
 
             # Thông tin bổ sung
             'portfolio_url', 'linkedin_profile', 'expected_salary', 'salary_currency',
@@ -256,34 +256,40 @@ class JobApplicationCreateSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        # Kiểm tra điều khoản
-        if not data.get('agree_terms'):
-            raise serializers.ValidationError({"agree_terms": "Bạn phải đồng ý với điều khoản và điều kiện"})
+        # Không kiểm tra điều khoản nữa
 
         # Tạo full_name từ first_name và last_name nếu không được cung cấp
         if not data.get('full_name') and data.get('first_name') and data.get('last_name'):
             data['full_name'] = f"{data['last_name']} {data['first_name']}"
 
         # Kiểm tra các trường bắt buộc
-        required_fields = ['full_name', 'email', 'phone', 'date_of_birth', 'address',
-                          'education', 'experience', 'skills', 'resume']
+        required_fields = ['full_name', 'email', 'phone']
 
         for field in required_fields:
             if not data.get(field):
                 raise serializers.ValidationError({field: f"Trường này là bắt buộc"})
 
+        # Đảm bảo các trường boolean có giá trị mặc định
+        boolean_fields = ['is_party_member', 'is_family_policy', 'military_service']
+        for field in boolean_fields:
+            if field not in data:
+                data[field] = False
+
         # Kiểm tra các trường phụ thuộc
         if data.get('is_family_policy'):
             if not data.get('family_policy_type'):
                 raise serializers.ValidationError({"family_policy_type": "Vui lòng chọn loại chính sách"})
-            if not data.get('family_policy_detail'):
-                raise serializers.ValidationError({"family_policy_detail": "Vui lòng nhập chi tiết chính sách"})
+            # Chi tiết chính sách không bắt buộc
+            # if not data.get('family_policy_detail'):
+            #     raise serializers.ValidationError({"family_policy_detail": "Vui lòng nhập chi tiết chính sách"})
 
         if data.get('military_service'):
-            if not data.get('military_service_date'):
-                raise serializers.ValidationError({"military_service_date": "Vui lòng nhập ngày bắt đầu"})
-            if not data.get('military_service_end_date'):
-                raise serializers.ValidationError({"military_service_end_date": "Vui lòng nhập ngày kết thúc"})
+            # Ngày bắt đầu và kết thúc nghĩa vụ quân sự không bắt buộc
+            pass
+            # if not data.get('military_service_date'):
+            #     raise serializers.ValidationError({"military_service_date": "Vui lòng nhập ngày bắt đầu"})
+            # if not data.get('military_service_end_date'):
+            #     raise serializers.ValidationError({"military_service_end_date": "Vui lòng nhập ngày kết thúc"})
 
         return data
 

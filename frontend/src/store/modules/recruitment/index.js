@@ -328,11 +328,15 @@ const actions = {
         })
       }
 
-      const response = await api.post('/recruitment/public/applications/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+      // Đảm bảo các trường boolean có giá trị mặc định
+      const booleanFields = ['is_party_member', 'is_family_policy', 'military_service']
+      for (const field of booleanFields) {
+        if (!formData.has(field)) {
+          formData.append(field, 'false')
         }
-      })
+      }
+
+      const response = await api.post('/recruitment/public/applications/', formData)
 
       commit('SET_ERROR', null)
       return response.data

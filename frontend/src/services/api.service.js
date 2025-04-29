@@ -43,6 +43,11 @@ apiClient.interceptors.request.use(
       }
     }
 
+    // Đặt Content-Type cho multipart/form-data
+    if (config.data instanceof FormData) {
+      config.headers['Content-Type'] = 'multipart/form-data'
+    }
+
     // Thêm debug log
     console.log(`API Request to ${config.url} - Public API: ${isPublicApi}`)
 

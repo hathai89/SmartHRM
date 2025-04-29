@@ -572,6 +572,19 @@ class PublicJobApplicationCreateView(viewsets.ModelViewSet):
     http_method_names = ['post']  # Chỉ cho phép phương thức POST
 
     def create(self, request, *args, **kwargs):
+        # In ra dữ liệu request để debug
+        print("Request data:", request.data)
+        print("Request data type:", type(request.data))
+
+        # In ra các trường bắt buộc trong mô hình
+        from recruitment.models import JobApplication
+        required_fields = [field.name for field in JobApplication._meta.fields if not field.null and not field.blank and not field.auto_created]
+        print("Required fields in model:", required_fields)
+
+        # Kiểm tra các trường bắt buộc trong request
+        for field in required_fields:
+            print(f"Field {field} in request: {field in request.data}")
+
         # Lấy tin tuyển dụng
         job_posting_id = request.data.get('job_posting')
         job_posting = get_object_or_404(JobPosting, id=job_posting_id)
@@ -593,7 +606,12 @@ class PublicJobApplicationCreateView(viewsets.ModelViewSet):
 
         # Tạo đơn ứng tuyển
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+
+        # Kiểm tra dữ liệu hợp lệ và in ra lỗi nếu có
+        if not serializer.is_valid():
+            print("Serializer errors:", serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         self.perform_create(serializer)
 
         # Gửi thông báo cho người tạo tin tuyển dụng

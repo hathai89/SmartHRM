@@ -247,7 +247,7 @@ class JobApplication(models.Model):
     last_name = models.CharField(max_length=50, verbose_name="Họ và tên đệm", blank=True, null=True)
     full_name = models.CharField(max_length=100, verbose_name="Họ và tên")
     gender = models.ForeignKey(Gender, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="Giới tính")
-    date_of_birth = models.DateField(verbose_name="Ngày sinh")
+    date_of_birth = models.DateField(verbose_name="Ngày sinh", blank=True, null=True)
     email = models.EmailField(verbose_name="Email")
     phone = models.CharField(max_length=20, verbose_name="Số điện thoại")
     marital_status = models.ForeignKey(MaritalStatus, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="Tình trạng hôn nhân")
@@ -255,7 +255,7 @@ class JobApplication(models.Model):
     birth_place = models.CharField(max_length=100, blank=True, null=True, verbose_name="Nơi sinh")
     ethnicity = models.CharField(max_length=50, blank=True, null=True, verbose_name="Dân tộc")
     religion = models.CharField(max_length=50, blank=True, null=True, verbose_name="Tôn giáo")
-    is_party_member = models.BooleanField(default=False, verbose_name="Là Đảng viên")
+    is_party_member = models.BooleanField(default=False, verbose_name="Là Đảng viên", blank=True)
 
     # Thông tin CCCD/CMND
     id_card_number = models.CharField(max_length=20, blank=True, null=True, verbose_name="Số CCCD/CMND")
@@ -266,7 +266,7 @@ class JobApplication(models.Model):
 
     # Thông tin địa chỉ
     permanent_address = models.TextField(blank=True, null=True, verbose_name="Địa chỉ thường trú")
-    address = models.TextField(verbose_name="Địa chỉ liên hệ")
+    address = models.TextField(verbose_name="Địa chỉ liên hệ", blank=True, null=True)
 
     # Thông tin liên hệ khẩn cấp
     emergency_contact_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="Tên người liên hệ khẩn cấp")
@@ -278,12 +278,12 @@ class JobApplication(models.Model):
     father_phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Số điện thoại cha")
     mother_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="Tên mẹ")
     mother_phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Số điện thoại mẹ")
-    is_family_policy = models.BooleanField(default=False, verbose_name="Thuộc diện chính sách")
+    is_family_policy = models.BooleanField(default=False, verbose_name="Thuộc diện chính sách", blank=True)
     family_policy_type = models.ForeignKey(FamilyPolicyType, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="Loại chính sách")
     family_policy_detail = models.TextField(blank=True, null=True, verbose_name="Chi tiết chính sách")
 
     # Thông tin nghĩa vụ quân sự
-    military_service = models.BooleanField(default=False, verbose_name="Đã hoàn thành nghĩa vụ quân sự")
+    military_service = models.BooleanField(default=False, verbose_name="Đã hoàn thành nghĩa vụ quân sự", blank=True)
     military_service_date = models.DateField(blank=True, null=True, verbose_name="Ngày bắt đầu nghĩa vụ quân sự")
     military_service_end_date = models.DateField(blank=True, null=True, verbose_name="Ngày kết thúc nghĩa vụ quân sự")
     military_service_role = models.CharField(max_length=100, blank=True, null=True, verbose_name="Chức vụ trong quân đội")
@@ -291,9 +291,9 @@ class JobApplication(models.Model):
     # Thông tin chuyên môn
     education_level = models.ForeignKey(EducationLevel, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="Trình độ học vấn")
     education_detail = models.TextField(blank=True, null=True, verbose_name="Chi tiết học vấn")
-    experience = models.TextField(verbose_name="Kinh nghiệm làm việc")
-    skills = models.TextField(verbose_name="Kỹ năng")
-    resume = models.FileField(upload_to=resume_file_path, verbose_name="CV")
+    experience = models.TextField(blank=True, null=True, verbose_name="Kinh nghiệm làm việc")
+    skills = models.TextField(blank=True, null=True, verbose_name="Kỹ năng")
+    resume = models.FileField(upload_to=resume_file_path, blank=True, null=True, verbose_name="CV")
     avatar = models.ImageField(upload_to=avatar_image_path, blank=True, null=True, verbose_name="Ảnh đại diện")
     cover_letter = models.TextField(blank=True, null=True, verbose_name="Thư giới thiệu")
 
