@@ -1,12 +1,16 @@
 // App state module
 const state = {
   isOffline: false,
-  showOfflineNotification: false
+  showOfflineNotification: false,
+  error: null,
+  success: null
 };
 
 const getters = {
   isOffline: state => state.isOffline,
-  showOfflineNotification: state => state.showOfflineNotification
+  showOfflineNotification: state => state.showOfflineNotification,
+  error: state => state.error,
+  success: state => state.success
 };
 
 const mutations = {
@@ -15,6 +19,18 @@ const mutations = {
   },
   SET_SHOW_OFFLINE_NOTIFICATION(state, show) {
     state.showOfflineNotification = show;
+  },
+  SET_ERROR(state, error) {
+    state.error = error;
+  },
+  SET_SUCCESS(state, success) {
+    state.success = success;
+  },
+  CLEAR_ERROR(state) {
+    state.error = null;
+  },
+  CLEAR_SUCCESS(state) {
+    state.success = null;
   }
 };
 
@@ -58,6 +74,42 @@ const actions = {
       dispatch('setOfflineStatus', true);
       return false;
     }
+  },
+
+  /**
+   * Đặt thông báo lỗi
+   */
+  setError({ commit }, error) {
+    commit('SET_ERROR', error);
+  },
+
+  /**
+   * Đặt thông báo thành công
+   */
+  setSuccess({ commit }, success) {
+    commit('SET_SUCCESS', success);
+  },
+
+  /**
+   * Xóa thông báo lỗi
+   */
+  clearError({ commit }) {
+    commit('CLEAR_ERROR');
+  },
+
+  /**
+   * Xóa thông báo thành công
+   */
+  clearSuccess({ commit }) {
+    commit('CLEAR_SUCCESS');
+  },
+
+  /**
+   * Xóa tất cả thông báo
+   */
+  clearMessages({ commit }) {
+    commit('CLEAR_ERROR');
+    commit('CLEAR_SUCCESS');
   }
 };
 

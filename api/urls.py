@@ -40,4 +40,5 @@ urlpatterns = [
     # Include departments and factories API endpoints
     path('', include('departments.urls')),
     path('', include('factories.urls')),
+    path('recruitment/', include('recruitment.urls')),
 ]

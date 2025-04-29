@@ -40,6 +40,7 @@ urlpatterns = [
     # App URLs
     path('', include('departments.urls')),
     path('', include('factories.urls')),
+    path('', include('recruitment.urls')),
 
     # Direct API endpoints for tree structures are now defined in their respective apps
 

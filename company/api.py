@@ -11,7 +11,7 @@ class CompanyViewSet(viewsets.ModelViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_permissions(self):
         """
         Chỉ cho phép admin chỉnh sửa thông tin công ty
@@ -19,8 +19,8 @@ class CompanyViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             self.permission_classes = [permissions.IsAdminUser]
         return super().get_permissions()
-    
-    @action(detail=False, methods=['get'])
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.AllowAny])
     def info(self, request):
         """
         Lấy thông tin công ty đầu tiên

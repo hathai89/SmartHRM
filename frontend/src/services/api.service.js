@@ -24,10 +24,15 @@ function getCsrfToken() {
 // Thêm interceptor cho request
 apiClient.interceptors.request.use(
   config => {
-    // Thêm token xác thực
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers['Authorization'] = `Token ${token}`
+    // Kiểm tra xem URL có phải là public API không
+    const isPublicApi = config.url.includes('/public/') || config.url.includes('/careers')
+
+    // Thêm token xác thực chỉ khi không phải là public API
+    if (!isPublicApi) {
+      const token = localStorage.getItem('token')
+      if (token) {
+        config.headers['Authorization'] = `Token ${token}`
+      }
     }
 
     // Thêm CSRF token cho các phương thức không an toàn
@@ -37,6 +42,9 @@ apiClient.interceptors.request.use(
         config.headers['X-CSRFToken'] = csrfToken
       }
     }
+
+    // Thêm debug log
+    console.log(`API Request to ${config.url} - Public API: ${isPublicApi}`)
 
     return config
   },
@@ -57,16 +65,29 @@ apiClient.interceptors.response.use(
     if (error.response) {
       // Xử lý lỗi 401 Unauthorized
       if (error.response.status === 401) {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        errorMessage = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+        // Kiểm tra xem URL có phải là public API không
+        const isPublicApi = error.config.url.includes('/public/') ||
+                           error.config.url.includes('/careers') ||
+                           router.currentRoute.value.meta.requiresAuth === false;
 
-        // Chuyển hướng đến trang đăng nhập nếu không phải đang ở trang đăng nhập
-        if (router.currentRoute.value.name !== 'login') {
-          router.push({
-            name: 'login',
-            query: { redirect: router.currentRoute.value.fullPath }
-          })
+        console.log(`401 Error for ${error.config.url} - Public API: ${isPublicApi}, Current route: ${router.currentRoute.value.name}`);
+
+        if (!isPublicApi) {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          errorMessage = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+
+          // Chuyển hướng đến trang đăng nhập nếu không phải đang ở trang đăng nhập
+          if (router.currentRoute.value.name !== 'login') {
+            router.push({
+              name: 'login',
+              query: { redirect: router.currentRoute.value.fullPath }
+            })
+          }
+        } else {
+          // Đối với public API, không cần chuyển hướng đến trang đăng nhập
+          errorMessage = 'Không thể truy cập tài nguyên này.';
+          console.error(errorMessage);
         }
       }
 

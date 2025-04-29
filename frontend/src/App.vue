@@ -23,11 +23,16 @@
 
     <!-- Main Application -->
     <div v-if="isReady">
-      <app-layout v-if="isAuthenticated">
+      <app-layout v-if="isAuthenticated && routeRequiresAuth">
         <breadcrumb :items="breadcrumbs" />
         <router-view />
       </app-layout>
-      <router-view v-else />
+      <public-layout v-else-if="!routeRequiresAuth">
+        <router-view />
+      </public-layout>
+      <div v-else class="auth-layout">
+        <router-view />
+      </div>
     </div>
   </div>
 </template>
@@ -36,6 +41,7 @@
 import BreadcrumbNav from '@/components/common/Breadcrumb.vue';
 import { getBreadcrumbs } from '@/utils/breadcrumb';
 import AppLayout from '@/components/layout/AppLayout.vue';
+import PublicLayout from '@/components/layout/PublicLayout.vue';
 import ErrorNotification from '@/components/common/ErrorNotification.vue';
 import OfflineNotification from '@/components/common/OfflineNotification.vue';
 
@@ -44,6 +50,7 @@ export default {
   components: {
     Breadcrumb: BreadcrumbNav,
     AppLayout,
+    PublicLayout,
     ErrorNotification,
     OfflineNotification
   },
@@ -55,6 +62,12 @@ export default {
   computed: {
     isAuthenticated() {
       return this.$store.getters['auth/isAuthenticated'];
+    },
+    routeRequiresAuth() {
+      // Kiểm tra xem route hiện tại có yêu cầu xác thực không
+      // Nếu có bất kỳ route nào trong matched có requiresAuth === false, thì đây là route public
+      const isPublicRoute = this.$route.matched.some(record => record.meta.requiresAuth === false);
+      return !isPublicRoute;
     },
     currentYear() {
       return new Date().getFullYear();
@@ -349,5 +362,25 @@ ul {
 
 .dropdown-menu.show {
   animation: fadeIn 0.3s ease;
+}
+
+// Public layout styles
+.public-layout {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+
+  .navbar {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+}
+
+// Auth layout styles
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, $gradient-start 0%, $gradient-middle 50%, $gradient-end 100%);
 }
 </style>

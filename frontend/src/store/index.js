@@ -8,6 +8,7 @@ import notifications from './modules/notifications'
 import company from './modules/company'
 import profile from './modules/profile'
 import app from './modules/app'
+import recruitment from './modules/recruitment'
 
 export default createStore({
   state: {
@@ -71,6 +72,7 @@ export default createStore({
     notifications,
     company,
     profile,
-    app
+    app,
+    recruitment
   }
 })

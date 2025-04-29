@@ -131,27 +131,39 @@
               </a>
               <ul class="dropdown-menu" :class="{ 'show': activeDropdown === 'recruitment' }">
                 <li>
-                  <router-link to="/job-postings" class="dropdown-item">
+                  <router-link to="/recruitment" class="dropdown-item">
+                    <font-awesome-icon icon="tachometer-alt" />
+                    <span>Tổng quan</span>
+                  </router-link>
+                </li>
+                <li>
+                  <router-link to="/recruitment/job-postings" class="dropdown-item">
                     <font-awesome-icon icon="list" />
                     <span>Tin tuyển dụng</span>
                   </router-link>
                 </li>
                 <li v-if="isAdmin">
-                  <router-link to="/job-postings/create" class="dropdown-item">
+                  <router-link to="/recruitment/job-postings/create" class="dropdown-item">
                     <font-awesome-icon icon="plus" />
                     <span>Thêm tin tuyển dụng</span>
                   </router-link>
                 </li>
                 <li>
-                  <router-link to="/job-applications" class="dropdown-item">
+                  <router-link to="/recruitment/applications" class="dropdown-item">
                     <font-awesome-icon icon="file-signature" />
                     <span>Đơn ứng tuyển</span>
                   </router-link>
                 </li>
                 <li>
-                  <router-link to="/interviews" class="dropdown-item">
+                  <router-link to="/recruitment/interviews" class="dropdown-item">
                     <font-awesome-icon icon="calendar-check" />
                     <span>Lịch phỏng vấn</span>
+                  </router-link>
+                </li>
+                <li>
+                  <router-link to="/careers" class="dropdown-item">
+                    <font-awesome-icon icon="globe" />
+                    <span>Trang tuyển dụng</span>
                   </router-link>
                 </li>
               </ul>

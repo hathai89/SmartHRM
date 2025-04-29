@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from '@/store'
+import recruitmentRoutes from './recruitment'
 
 // Lazy-load các component
 const Login = () => import('@/views/auth/Login.vue')
@@ -24,6 +25,7 @@ const routes = [
     path: '/',
     redirect: '/dashboard'
   },
+  ...recruitmentRoutes,
   {
     path: '/login',
     name: 'login',
@@ -143,23 +145,42 @@ router.beforeEach((to, from, next) => {
   const isAdmin = user && user.is_staff
 
   // Kiểm tra xem route có yêu cầu xác thực không
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    // Nếu route yêu cầu xác thực và người dùng chưa đăng nhập, chuyển hướng đến trang đăng nhập
-    next({ name: 'login', query: { redirect: to.fullPath } })
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth === true)
+  const isPublicRoute = to.matched.some(record => record.meta.requiresAuth === false)
+
+  // Nếu là route public, cho phép truy cập không cần xác thực
+  if (isPublicRoute) {
+    return next()
   }
-  // Kiểm tra xem route có yêu cầu quyền admin không
-  else if (to.meta.requiresAdmin && !isAdmin) {
-    // Nếu route yêu cầu quyền admin và người dùng không phải admin, chuyển hướng đến trang chủ
-    next({ name: 'dashboard' })
-  }
+
   // Nếu người dùng đã đăng nhập và cố gắng truy cập trang đăng nhập, chuyển hướng đến trang chủ
-  else if (to.name === 'login' && isAuthenticated) {
-    next({ name: 'dashboard' })
+  if (to.name === 'login' && isAuthenticated) {
+    return next({ name: 'dashboard' })
   }
+
+  // Nếu route yêu cầu xác thực và người dùng chưa đăng nhập, chuyển hướng đến trang đăng nhập
+  if (requiresAuth && !isAuthenticated) {
+    return next({ name: 'login', query: { redirect: to.fullPath } })
+  }
+
+  // Kiểm tra xem route có yêu cầu quyền admin không
+  if (to.meta.requiresAdmin && !isAdmin) {
+    return next({ name: 'dashboard' })
+  }
+
+  // Mặc định, các route đều yêu cầu xác thực trừ khi được chỉ định rõ ràng là không
+  if (to.meta.requiresAuth === undefined) {
+    if (isAuthenticated) {
+      // Nếu chưa xác định requiresAuth nhưng người dùng đã đăng nhập, cho phép truy cập
+      return next()
+    } else {
+      // Nếu chưa xác định requiresAuth và người dùng chưa đăng nhập, chuyển hướng đến trang đăng nhập
+      return next({ name: 'login', query: { redirect: to.fullPath } })
+    }
+  }
+
   // Trong các trường hợp khác, cho phép truy cập
-  else {
-    next()
-  }
+  next()
 })
 
 export default router
